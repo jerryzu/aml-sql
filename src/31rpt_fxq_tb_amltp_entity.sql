@@ -21,7 +21,7 @@ concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) c_cst_no
 concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')) c_cst_no
 concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')) c_cst_no -- 客户号
 */
-alter table rpt_fxq_tb_amltp_entity truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_amltp_entity truncate partition pt20191013000000;
 
 insert into rpt_fxq_tb_amltp_entity(
     c_cst_no	
@@ -37,7 +37,7 @@ select
     ,c_certf_type c_cert_type
     ,c_certf_cde c_cert_cde
     ,c_clnt_cde
-    ,'{lastday}000000' pt	--	分区字段
+    ,'20191013000000' pt	--	分区字段
 from (select
         concat(rpad(c_certf_type, 6, '0') , rpad(c_certf_cde, 18, '0')) c_cst_no,
         c_clnt_nme,
@@ -49,7 +49,7 @@ from (select
         if(@u=c_clnt_cde ,@r:=@r+1,@r:=1) as rank, 
 		@u:=c_clnt_cde 
     from
-        ods_amltp_t_score partition(pt{lastday}000000),(select @u:=null, @r:=0) r 
+        ods_amltp_t_score partition(pt20191013000000),(select @u:=null, @r:=0) r 
     where
         app_or_ins = 1
     order by

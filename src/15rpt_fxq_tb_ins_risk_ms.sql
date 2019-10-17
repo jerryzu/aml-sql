@@ -13,7 +13,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_ins_risk_ms truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_ins_risk_ms truncate partition pt20191013000000;
 
 insert into rpt_fxq_tb_ins_risk_ms(
 	company_code1,	--	机构网点代码
@@ -41,7 +41,7 @@ select
     first_type,
     score,
     norm,
-    '{lastday}000000' pt	--	分区字段
+    '20191013000000' pt	--	分区字段
 from (
     select
         company_code1,	--	机构网点代码
@@ -59,7 +59,7 @@ from (
         score,	--	评分分值
 		/* 划分依据 unpass*/  -- 填写具体划分标准及相应得分分值, 多个标准间用"; "隔开。如, 保单险种2分; 保险期间3分等, 如采用直接评级的, 填写评级理由, 如"涉及保险欺诈"等。
 		norm	--	划分依据
-    from rpt_fxq_tb_amltp_risk  partition (pt{lastday}000000) r,  (select @u:=null, @s:=null, @r:=0, @n:=0) r1
+    from rpt_fxq_tb_amltp_risk  partition (pt20191013000000) r,  (select @u:=null, @s:=null, @r:=0, @n:=0) r1
     order by app_cst_no, div_date
     ) v
 where v.rank = 1

@@ -13,7 +13,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_lar_report_ms truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_lar_report_ms truncate partition pt20191013000000;
 
 insert into rpt_fxq_tb_lar_report_ms(
     ricd,
@@ -150,7 +150,7 @@ select
     ,null		ocec	  --  	非柜台交易方式的设备代码
 	/* 交易信息备注 */  -- 暂填写"@N"
     ,null		rotf	  --  	交易信息备注
-    ,'{lastday}000000' pt	--	分区字段
-from ods_amltp_t_lat_data  partition(pt{lastday}000000)  d 
-    inner join ods_amltp_t_lat_customer  partition(pt{lastday}000000)  c on d.r_cust_id = c.r_cust_id
-    inner join ods_amltp_t_ih_tsdt  partition(pt{lastday}000000)  t on d.app_no = t.app_no
+    ,'20191013000000' pt	--	分区字段
+from ods_amltp_t_lat_data  partition(pt20191013000000)  d 
+    inner join ods_amltp_t_lat_customer  partition(pt20191013000000)  c on d.r_cust_id = c.r_cust_id
+    inner join ods_amltp_t_ih_tsdt  partition(pt20191013000000)  t on d.app_no = t.app_no

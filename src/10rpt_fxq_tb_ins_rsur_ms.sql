@@ -13,7 +13,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_ins_rsur_ms truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_ins_rsur_ms truncate partition pt20191013000000;
 
 INSERT INTO rpt_fxq_tb_ins_rsur_ms(
         company_code1,
@@ -92,12 +92,12 @@ select
     mny.c_bank_nme	          as acc_bank,-- 交费账户开户机构名称
     a.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     a.c_edr_no as endorse_no,-- 批单号
-    '{lastday}000000' pt
-from ods_cthx_web_ply_base partition(pt{lastday}000000) a
-    inner join ods_cthx_web_fin_prm_due partition(pt{lastday}000000) due on a.c_ply_no = due.c_ply_no
-    inner join ods_cthx_web_fin_cav_mny partition(pt{lastday}000000) mny on due.c_cav_no = mny.c_cav_pk_id
-	inner join edw_cust_ply_party_applicant partition(pt{lastday}000000) b on a.c_ply_no=b.c_ply_no
-	inner join ods_cthx_web_bas_edr_rsn   partition(pt{lastday}000000) c on a.c_edr_rsn_bundle_cde=c.c_rsn_cde and substr(a.c_prod_no,1,2)=c.c_kind_no
-	left join rpt_fxq_tb_company_ms partition (pt{lastday}000000) co on co.company_code1 = a.c_dpt_cde
+    '20191013000000' pt
+from rpt_fxq_tb_ply_base_ms a
+    inner join ods_cthx_web_fin_prm_due partition(pt20191013000000) due on a.c_ply_no = due.c_ply_no
+    inner join ods_cthx_web_fin_cav_mny partition(pt20191013000000) mny on due.c_cav_no = mny.c_cav_pk_id
+	inner join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_ply_no=b.c_ply_no
+	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) c on a.c_edr_rsn_bundle_cde=c.c_rsn_cde and substr(a.c_prod_no,1,2)=c.c_kind_no
+	left join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
 where c.c_rsn_cde in ('08','s1','s2') and a.t_next_edr_bgn_tm > now() 
 	-- and a.t_edr_bgn_tm between and 

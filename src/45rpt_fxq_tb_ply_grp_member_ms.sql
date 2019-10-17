@@ -1,6 +1,7 @@
 /*
 create table rpt_fxq_tb_ply_grp_member_ms(
         c_ply_no varchar(30) collate utf8_bin comment '保单号',
+        c_app_no varchar(50) COLLATE utf8_bin NOT NULL COMMENT '申请单号,批改申请单号',
         c_nme varchar(100) collate utf8_bin comment '姓名',
         c_cert_typ varchar(30) collate utf8_bin comment '证件类型',
         c_cert_no varchar(30) collate utf8_bin comment '证件号码',
@@ -18,6 +19,7 @@ create table rpt_fxq_tb_ply_grp_member_ms(
 truncate table  rpt_fxq_tb_ply_grp_member_ms;
 insert into rpt_fxq_tb_ply_grp_member_ms(
     c_ply_no	--  保单号
+    ,c_app_no   -- 申请单号,批改申请单号
     ,c_nme	
     ,c_cert_typ	--  证件类型
     ,c_cert_no	--  证件类型
@@ -33,6 +35,7 @@ insert into rpt_fxq_tb_ply_grp_member_ms(
 )
 select 
     c_ply_no	--  保单号
+    ,c_app_no   -- 申请单号,批改申请单号
     ,c_nme	
     ,c_cert_typ	--  证件类型
     ,c_cert_no	--  证件类型

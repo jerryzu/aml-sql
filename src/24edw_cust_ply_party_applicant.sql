@@ -15,7 +15,7 @@
 
 SELECT @@global.group_concat_max_len;
 SET SESSION group_concat_max_len=10240;
-alter table edw_cust_ply_party_applicant truncate partition pt{lastday}000000;
+alter table edw_cust_ply_party_applicant truncate partition pt20191013000000;
 
 INSERT INTO edw_cust_ply_party_applicant(
         c_ply_no,
@@ -38,8 +38,8 @@ SELECT
     pp.c_clnt_mrk,
     pp.c_biz_type,
     pp.pt
-FROM edw_cust_ply_party partition(pt{lastday}000000) pp
-    inner join edw_cust_pers_info partition(pt{lastday}000000) p on pp.c_cst_no = p.c_cst_no
+FROM edw_cust_ply_party partition(pt20191013000000) pp
+    inner join edw_cust_pers_info partition(pt20191013000000) p on pp.c_cst_no = p.c_cst_no
 where pp.c_biz_type = 21; -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
 
 INSERT INTO edw_cust_ply_party_applicant(
@@ -63,6 +63,6 @@ SELECT
     pp.c_clnt_mrk,
     pp.c_biz_type,
     pp.pt
-FROM edw_cust_ply_party partition(pt{lastday}000000) pp
-    inner join edw_cust_units_info partition(pt{lastday}000000) p on pp.c_cst_no = p.c_cst_no
+FROM edw_cust_ply_party partition(pt20191013000000) pp
+    inner join edw_cust_units_info partition(pt20191013000000) p on pp.c_cst_no = p.c_cst_no
 where pp.c_biz_type = 22; -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人

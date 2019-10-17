@@ -13,7 +13,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_ins_gpol_ms truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_ins_gpol_ms truncate partition pt20191013000000;
 
 INSERT INTO rpt_fxq_tb_ins_gpol_ms(
         company_code1,
@@ -56,7 +56,7 @@ SELECT
     a.c_app_no                              as app_no,-- 投保单号
     case when a.c_edr_type in ('2','3') or a.t_insrnc_end_tm < now() then 11 else 12 end as ins_state,-- 保单状态 --edr_type in ('2','3') or  T_INSRNC_END_TM<=date then 终止 else 有效
     case a.c_grp_mrk when 0 then 11 when 1 then 12 end as app_type,-- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
-    case ifnull((select c_kind_no from ods_cthx_web_prd_prod partition(pt{lastday}000000) v where v.c_prod_no = a.c_prod_no), 1)
+    case ifnull((select c_kind_no from ods_cthx_web_prd_prod partition(pt20191013000000) v where v.c_prod_no = a.c_prod_no), 1)
             when '1' then
             case a.c_cha_subtype 
                     -- 财产保险销售渠道:11:个人代理;12:保险代理机构或经济机构;13:银邮代理;14:网销(本机构);15:电销;16:农村网点;17:营业网点;18:第三方平台;19:其他;
@@ -99,7 +99,7 @@ SELECT
     end as sale_type,-- 销售渠道
     -- 个人代理：为代理人名称；银保通代理点：**银行**分行等
 	/* 销售渠道名称 unpass*/   -- 对应Sale_type销售渠道填写。如销售渠道为"个人代理", 则本字段填写为个人代理人名称(如"张**"); 销售渠道为"银保通代理点", 则本字段填写为"**银行**分行"等。
-    (select c_cha_nme from ods_cthx_web_cus_cha partition(pt{lastday}000000) v where v.c_cha_cde = a.c_brkr_cde) as sale_name,-- 销售渠道名称
+    (select c_cha_nme from ods_cthx_web_cus_cha partition(pt20191013000000) v where v.c_cha_cde = a.c_brkr_cde) as sale_name,-- 销售渠道名称
     date_format(a.t_app_tm,'%Y%m%d')        as ins_date,-- 投保日期
     date_format(a.t_insrnc_bgn_tm,'%Y%m%d') as eff_date,-- 合同生效日期
     u.c_applicant_name                            as app_name,-- 投保人名称
@@ -161,19 +161,19 @@ SELECT
     mny.c_savecash_bank          as acc_no,-- 交费账号
     mny.c_bank_nme	          as acc_bank,-- 交费账户开户机构名称
     a.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
-    '{lastday}000000'    pt
-from  ods_cthx_web_ply_base partition(pt{lastday}000000) a
-    inner join ods_cthx_web_fin_prm_due partition(pt{lastday}000000) due on a.c_ply_no = due.c_ply_no
-    inner join ods_cthx_web_fin_cav_mny partition(pt{lastday}000000) mny on due.c_cav_no = mny.c_cav_pk_id
-    inner join edw_cust_ply_party_applicant   partition(pt{lastday}000000) u on a.c_ply_no =u.c_ply_no and u.c_biz_type = 22 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人
-    inner join ods_cthx_web_ply_ent_tgt partition(pt{lastday}000000) t
+    '20191013000000'    pt
+from  rpt_fxq_tb_ply_base_ms a
+    inner join ods_cthx_web_fin_prm_due partition(pt20191013000000) due on a.c_ply_no = due.c_ply_no
+    inner join ods_cthx_web_fin_cav_mny partition(pt20191013000000) mny on due.c_cav_no = mny.c_cav_pk_id
+    inner join edw_cust_ply_party_applicant   partition(pt20191013000000) u on a.c_ply_no =u.c_ply_no and u.c_biz_type = 22 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人
+    inner join ods_cthx_web_ply_ent_tgt partition(pt20191013000000) t
         on a.c_ply_no=t.c_ply_no
-    inner join ods_cthx_web_prd_prod partition(pt{lastday}000000) c 
+    inner join ods_cthx_web_prd_prod partition(pt20191013000000) c 
         on a.c_prod_no=c.c_prod_no
     inner join (select pi.c_ply_no, count(1) ins_num
-        from  edw_cust_ply_party partition(pt{lastday}000000) pi 
+        from  edw_cust_ply_party partition(pt20191013000000) pi 
         where pi.c_biz_type =  32 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人        
 		group by pi.c_ply_no
 		) v on a.c_ply_no = v.c_ply_no
-    inner join  rpt_fxq_tb_company_ms partition (pt{lastday}000000) co on co.company_code1 = a.c_dpt_cde
+    inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
 where a.t_next_edr_bgn_tm > now() 

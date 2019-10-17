@@ -13,7 +13,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_ins_rchg_ms truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_ins_rchg_ms truncate partition pt20191013000000;
 
 INSERT INTO rpt_fxq_tb_ins_rchg_ms(
         company_code1,
@@ -49,11 +49,11 @@ select
         -- when a.c_edr_rsn_bundle_cde = 'Z1' then 12 -- 增加被保险人
     end as item, -- 保全/批改项目	11:变更投保人;12:团险替换被保险人;13:变更受益人;14:变更客户(投保人被保人)信息;15:保单转移;
 	a.c_edr_ctnt as con_bef,-- 变更内容摘要
-    '{lastday}000000' pt
-from ods_cthx_web_ply_base partition(pt{lastday}000000) a
-	inner join edw_cust_ply_party_applicant partition(pt{lastday}000000) b on a.c_ply_no=b.c_ply_no
-	inner join ods_cthx_web_bas_edr_rsn   partition(pt{lastday}000000) c on a.c_edr_rsn_bundle_cde=c.c_rsn_cde and substr(a.c_prod_no,1,2)=c.c_kind_no
-    left join  rpt_fxq_tb_company_ms partition (pt{lastday}000000) co on co.company_code1 = a.c_dpt_cde
+    '20191013000000' pt
+from rpt_fxq_tb_ply_base_ms a
+	inner join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_ply_no=b.c_ply_no
+	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) c on a.c_edr_rsn_bundle_cde=c.c_rsn_cde and substr(a.c_prod_no,1,2)=c.c_kind_no
+    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
 where c.c_rsn_cde in ('22','-J1','-Z1') and a.t_next_edr_bgn_tm > now()  
-    and a.n_prm_var <> 0 --测试此条件没有满足记录
+    and a.n_prm_var <> 0 --  测试此条件没有满足记录
 	-- and a.t_edr_bgn_tm between and 

@@ -25,7 +25,7 @@ CREATE TABLE `rpt_fxq_tb_ply_insured_ms` (
   `c_certf_cls` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证件类型',
   `t_certf_end_date` datetime DEFAULT NULL COMMENT '证件有效期止',
   `c_aml_country` varchar(30) DEFAULT NULL COMMENT '国籍',
-  `c_cst_sex` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '性别',
+  `c_sex` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '性别',
   `c_mobile` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '移动电话',
   `c_trd_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '行业代码',
   `c_occup_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '职业代码',
@@ -61,7 +61,7 @@ c_ply_no
 ,c_certf_cls	--  证件类型
 ,t_certf_end_date	--  证件有效期止
 ,c_aml_country	--  国籍
-,c_cst_sex	--  性别
+,c_sex	--  性别
 ,c_mobile	--  移动电话
 ,c_trd_cde	--  行业代码
 ,c_occup_cde	--  职业代码
@@ -100,7 +100,7 @@ null c_ply_no
 ,a.c_certf_cls  -- 证件种类
 ,a.t_certf_end_date -- 证件有效期止
 ,a.c_aml_country -- 国籍
-,a.c_sex c_cst_sex -- 性别
+,a.c_sex -- 性别
 ,a.c_mobile  -- 移动电话
 ,a.c_trd_cde  -- 行业 --c_sub_trd_cde
 ,a.c_occup_cde -- 职业代码  

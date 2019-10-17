@@ -12,6 +12,7 @@
 #from information_schema.partitions  where 
 #  table_schema = schema()  and table_name like 'rpt_fxq%'
 
+#  excel: =CONCATENATE("sed ""s/{lastday}/$lastday/g"" ",C3," > work/",C3)
 
 echo '请输入分区日期?'
 read lastday 

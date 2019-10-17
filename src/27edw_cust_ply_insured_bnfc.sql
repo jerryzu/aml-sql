@@ -36,7 +36,7 @@ select
     ,concat('1', c_bnfc_no, mod(substr(c_bnfc_no, -7, 6), 9)) c_bnfc_no
     ,c_clnt_mrk
     ,c_biz_type
-    ,'{lastday}000000' pt
+    ,'20191013000000' pt
 from (
         select 
                 b.c_dpt_cde c_dpt_cde
@@ -48,8 +48,8 @@ from (
                 ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
                 ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
                 ,null c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-        from ods_cthx_web_app_grp_member  partition(pt{lastday}000000)  a
-                inner join ods_cthx_web_ply_base partition(pt{lastday}000000) b on a.c_app_no = b.c_app_no
+        from rpt_fxq_tb_ply_member_ms  a
+                inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
         where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0 and c_cert_no is not null and trim(c_cert_no)  <> '' 
                 and c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0 and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' 
 ) v
@@ -73,7 +73,7 @@ select
     ,concat('1', c_bnfc_no, mod(substr(c_bnfc_no, -7, 6), 9)) c_bnfc_no
     ,c_clnt_mrk
     ,c_biz_type
-    ,'{lastday}000000' pt
+    ,'20191013000000' pt
 from (
         select 
                 b.c_dpt_cde c_dpt_cde
@@ -85,9 +85,9 @@ from (
                 ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
                 ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
                 ,9 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-        from ods_cthx_web_ply_base partition(pt{lastday}000000) b  
-                inner join ods_cthx_web_app_insured  partition(pt{lastday}000000)  i on b.c_app_no = i.c_app_no
-                inner join ods_cthx_web_ply_bnfc  partition(pt{lastday}000000)  b1 on b.c_app_no = b1.c_app_no
+        from rpt_fxq_tb_ply_base_ms b  
+                inner join rpt_fxq_tb_ply_insured_ms  i on b.c_app_no = i.c_app_no
+                inner join rpt_fxq_tb_ply_bnfc_ms  b1 on b.c_app_no = b1.c_app_no
         where i.c_certf_cls is not null and trim(i.c_certf_cls)  <> '' and i.c_certf_cls REGEXP '[^0-9.]' = 0 and i.c_certf_cde is not null and trim(i.c_certf_cde)  <> '' 
                 and b1.c_certf_cls is not null and trim(b1.c_certf_cls)  <> '' and b1.c_certf_cls REGEXP '[^0-9.]' = 0 and b1.c_certf_cde is not null and trim(b1.c_certf_cde)  <> '' 
 ) v
@@ -101,14 +101,14 @@ select
 	c_acc_name, 
 	c_cert_cls, 
 	c_cert_cde
-from edw_cust_pers_info partition(pt{lastday}000000)
+from edw_cust_pers_info partition(pt20191013000000)
 union all
 select 
 	c_cst_no, 
 	c_acc_name, 
 	c_certf_cls, 
 	c_certf_cde
-from edw_cust_units_info  partition(pt{lastday}000000);
+from edw_cust_units_info  partition(pt20191013000000);
 
 insert into edw_cust_ply_insured_bnfc(
     c_dpt_cde,

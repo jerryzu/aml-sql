@@ -13,7 +13,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_ins_bo_ms truncate partition pt{lastday}000000;
+alter table rpt_fxq_tb_ins_bo_ms truncate partition pt20191013000000;
 
 INSERT INTO rpt_fxq_tb_ins_bo_ms(
         company_code1,
@@ -58,12 +58,12 @@ select
      p.c_cert_cde as id_no5,-- 受益所有人证件号码
     date_format(t_cert_end_date,'%Y%m%d') id_deadline5,-- 受益所有人证件有效期
     '@N'as sys_name,-- 系统名称,
-    '{lastday}000000' pt
-from edw_cust_ply_party partition(pt{lastday}000000) a1
-    inner join edw_cust_ply_party partition(pt{lastday}000000) a2 on a1.c_ply_no = a2.c_ply_no
-    left join  edw_cust_units_info partition(pt{lastday}000000)  u on a1.c_cst_no = u.c_cst_no
-    left join edw_cust_pers_info partition(pt{lastday}000000) p on a2.c_cst_no = p.c_cst_no
-    left join  rpt_fxq_tb_company_ms partition (pt{lastday}000000) co on co.company_code1 = u.c_dpt_cde
+    '20191013000000' pt
+from edw_cust_ply_party partition(pt20191013000000) a1
+    inner join edw_cust_ply_party partition(pt20191013000000) a2 on a1.c_ply_no = a2.c_ply_no
+    left join  edw_cust_units_info partition(pt20191013000000)  u on a1.c_cst_no = u.c_cst_no
+    left join edw_cust_pers_info partition(pt20191013000000) p on a2.c_cst_no = p.c_cst_no
+    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = u.c_dpt_cde
 where a1.c_biz_type = 22 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
    and a1.c_clnt_mrk='0' -- 受益人没有客户类别区分,申请人有客户类别区分
    and a2.c_biz_type = 43 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人

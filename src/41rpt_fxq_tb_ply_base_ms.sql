@@ -12,6 +12,7 @@ CREATE TABLE `rpt_fxq_tb_ply_base_ms` (
   `t_edr_app_tm` datetime DEFAULT NULL COMMENT '批改申请日期',
   `t_edr_bgn_tm` datetime DEFAULT NULL COMMENT '批改生效起期',
   `t_next_edr_bgn_tm` datetime DEFAULT NULL COMMENT '批改生效起期 Beginning of Successive Edorsement  Effective Time ',
+  `t_udr_tm` datetime DEFAULT NULL COMMENT '核保日期 Underwrite Time',
   `c_edr_type` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '批改类型,1 一般批改，2 注销，3退保  4、组合批改  5 满期返还  9 批单撤销',
   `c_edr_no` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '批单号',
   `c_edr_rsn_bundle_cde` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '批改原因或组合代码',
@@ -21,9 +22,11 @@ CREATE TABLE `rpt_fxq_tb_ply_base_ms` (
   `acc_name` varchar(100) DEFAULT NULL COMMENT '缴款人',
   `acc_no` varchar(30) DEFAULT NULL COMMENT '存现银行',
   `acc_bank` varchar(100) DEFAULT NULL COMMENT '客户银行名称',
-  `c_edr_ctnt` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '批文内容'
+  `c_edr_ctnt` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '批文内容',
+  `c_grp_mrk` varchar(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '0' COMMENT '团单标志( 0 个单; 1 团单) Group Insurance Flag'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 */
+
 drop table  if exists pay;
 create temporary table pay
 select  
@@ -75,6 +78,7 @@ insert into rpt_fxq_tb_ply_base_ms(
         ,t_edr_app_tm	--  批改申请日期
         ,t_edr_bgn_tm	--  批改生效起期
         ,t_next_edr_bgn_tm	--  批改生效起期 Beginning of Successive Edorsement  Effective Time 
+        ,t_udr_tm       --   核保日期
         ,c_edr_type	--  批改类型,1 一般批改，2 注销，3退保  4、组合批改  5 满期返还  9 批单撤销
         ,c_edr_no	--  批单号
         ,c_edr_rsn_bundle_cde --  	批改原因或组合代码
@@ -85,6 +89,7 @@ insert into rpt_fxq_tb_ply_base_ms(
         ,acc_no	--  存现银行
         ,acc_bank	--  客户银行名称
         ,c_edr_ctnt	--  批文内容
+        ,c_grp_mrk -- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
 )
 select 
 	a.c_dpt_cde
@@ -99,6 +104,7 @@ select
 	, a.t_edr_app_tm -- 申请日期
 	, a.t_edr_bgn_tm -- 变更或批改日期
 	, a.t_next_edr_bgn_tm
+        , a.t_udr_tm  -- 核保日期
 	, a.c_edr_type
 	, a.c_edr_no -- 批单号
 	, a.c_edr_rsn_bundle_cde-- 业务类型 11:退保;12:减保;13:保单部分领取;14:保单贷款;15:其他
@@ -110,6 +116,7 @@ select
         , acc_no -- 交费账号
         , acc_bank -- 交费账户开户机构名称
 	, a.c_edr_ctnt -- 变更内容摘要
+        , a.c_grp_mrk -- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
 from  ods_cthx_web_ply_base partition(pt20191013000000)  a
      left join pay1 p on a.c_app_no = p.c_app_no    
 where a.t_next_edr_bgn_tm > now();
