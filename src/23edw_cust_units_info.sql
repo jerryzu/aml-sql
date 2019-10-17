@@ -50,7 +50,7 @@ insert into edw_cust_units_info(
 )
 select 
     substring_index(c_dpt_cde,',',1) c_dpt_cde
-    ,c_cst_no
+    ,concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
     ,substring_index(c_certf_cls,',',1) c_certf_cls
     ,substring_index(c_certf_cde,',',1) c_certf_cde
     ,t_open_time t_open_time
@@ -85,7 +85,7 @@ from (
         -- c_cst_no已经处理了2. 3. 4.暂时忽略, 这里只需要处理1.5.
         -- 开始(1)标识为个人
         -- c_cst_no已经编码由身份证类型6位,身份证号码18位组成,这里校验码取倒数第7位至倒数第2位与9取MOD
-        ,concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) c_cst_no
+        ,c_cst_no
 	    ,group_concat(c_certf_cls order by biz_type)  c_certf_cls
 	    ,group_concat(c_certf_cde order by biz_type)  c_certf_cde
 	    ,min(t_open_time)  t_open_time

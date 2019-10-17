@@ -40,7 +40,7 @@ select
 	a.c_ply_no as pol_no,-- 保单号
 	date_format(a.t_app_tm,'%y%m%d') as ins_date,-- 投保日期
 
-	b.c_applicant_name as app_name,-- 投保人名称
+	b.c_acc_name as app_name,-- 投保人名称
 	b.c_cst_no as app_cst_no,-- 投保人客户号
 	b.c_cert_cde as app_id_no,-- 投保人证件号码
 
@@ -51,7 +51,7 @@ select
         else 
         null-- 其它
     end	as insbene_cus_pro,-- 被保人或受益人类型 11：个人；12：单位
-	case c.c_app_relation
+	case c.c_app_insured_relation
 	when '601001' then '12' -- 配偶
 	when '601002' then '13' -- 父母
 	when '601003' then '14' -- 子女
@@ -70,13 +70,14 @@ select
 	'@N' -- 其它
 	end  as relation,-- 投保人、被保人之间的关系 11：本单位；12本单位董事、监事或高级管理人员；13：雇佣或劳务；14：其他
 	'' as fav_type,-- 受益人标识 11：法定受益人；12非法定受益人 insfav_type=12时填写
-	c.c_insured_name as name,-- 被保人或受益人名称
+	c.c_acc_name as name,-- 被保人或受益人名称
 	concat(rpad(c.c_cert_cls, 6, '0') , rpad(c.c_cert_cde, 18, '0')) as insbene_cst_no,-- 被保险人或受益人客户号
 	c.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
     '20191013000000' pt
-from rpt_fxq_tb_ply_base partition(pt20191013000000) a
-	inner join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_app_no=b.c_app_no
-	inner join edw_cust_ply_party_insured partition(pt20191013000000) c on a.c_app_no=c.c_app_no
+from rpt_fxq_tb_ply_base_ms a
+	-- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
+	inner join edw_cust_ply_party partition(pt20191013000000) b on a.c_app_no=b.c_app_no and b.c_biz_type in (21, 22)  
+	inner join edw_cust_ply_party partition(pt20191013000000) c on a.c_app_no=c.c_app_no and c.c_biz_type in (31, 32, 33)
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
 where a.t_next_edr_bgn_tm > now() and b.c_clnt_mrk = 1
 union all
@@ -86,7 +87,7 @@ select
 	'' as company_code3,-- 保单归属机构网点代码
 	a.c_ply_no as pol_no,-- 保单号
 	date_format(a.t_app_tm,'%y%m%d') as ins_date,-- 投保日期
-	b.c_applicant_name as app_name,-- 投保人名称
+	b.c_acc_name as app_name,-- 投保人名称
 	b.c_cst_no as app_cst_no,-- 投保人客户号
 	b.c_cert_cde as app_id_no,-- 投保人证件号码
 	'12' as insfav_type,-- 被保人或受益人标识 11:被保险人； 12：受益人
@@ -101,12 +102,12 @@ select
 	'' as relation,-- 投保人、被保人之间的关系 11：本单位；12本单位董事、监事或高级管理人员；13：雇佣或劳务；14：其他
 	/* 受益人标识 unpass*/  -- 11: 法定受益人; 12: 非法定受益人。当被保险人或受益人标识Insfav_type='12'时填写。
 	'' as fav_type,-- 受益人标识 11：法定受益人；12非法定受益人 insfav_type=12时填写
-	c.c_bnfc_name as name,-- 被保人或受益人名称
+	c.c_acc_name as name,-- 被保人或受益人名称
 	concat(rpad(c.c_cert_cls, 6, '0') , rpad(c.c_cert_cde, 18, '0')) as insbene_cst_no,-- 被保险人或受益人客户号
 	c.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
 	'20191013000000' pt	
-from rpt_fxq_tb_ply_base partition(pt20191013000000) a
-	inner join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_app_no=b.c_app_no
-	inner join edw_cust_ply_party_bnfc partition(pt20191013000000) c on a.c_app_no=c.c_app_no
+from rpt_fxq_tb_ply_base_ms a
+	inner join edw_cust_ply_party partition(pt20191013000000) b on a.c_app_no=b.c_app_no and b.c_biz_type in (21, 22)
+	inner join edw_cust_ply_party partition(pt20191013000000) c on a.c_app_no=c.c_app_no and c.c_biz_type in (31, 32, 33)
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
 where a.t_next_edr_bgn_tm > now() and b.c_clnt_mrk = 1

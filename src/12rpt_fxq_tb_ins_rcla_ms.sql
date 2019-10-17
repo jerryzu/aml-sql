@@ -1,4 +1,4 @@
--- *********************************************************************************
+-- *******************eeeerrrrr**************************************************************
 --  文件名称: .sql
 --  所属主题: 理赔
 --  功能描述: 从 
@@ -91,8 +91,8 @@ select
 	g.n_amt as cla_amt,-- 理赔金额 same as n_paid_amt --web_clm_bank.n_amt 保留2位小数
 	null as cla_usd_amt,-- 折合美元金额
 	u.c_clm_no cla_no,-- 赔案号
-	'' as tsf_flag,-- 支付方式 10:现金;11:银行转账;12:其他
-	g.c_payee_nme as acc_name,-- 实际领款人名称
+	case a.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- d.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
+    g.c_payee_nme as acc_name,-- 实际领款人名称
 	g.c_bank_num as acc_no,-- 实际领款人账号
 	g.c_bank_cde as acc_bank,-- 实际领款人开户机构
 	g.c_pub_piv as acc_type,-- 实际领款人类型 11:个人;12:单位客户	

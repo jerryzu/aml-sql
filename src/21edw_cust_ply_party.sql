@@ -17,6 +17,7 @@ SELECT @@global.group_concat_max_len;
 SET SESSION group_concat_max_len=10240;
 alter table edw_cust_ply_party truncate partition pt20191013000000;
 
+
 INSERT INTO edw_cust_ply_party(
     c_dpt_cde,
     c_cst_no,
@@ -87,12 +88,10 @@ from (
             ,b.c_app_no
 		    ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
 		    ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-		    ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
+		    ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有rpt_fxq_tb_ply_grp_member_ms.c_clnt_mrk
 		    ,33 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
 		from rpt_fxq_tb_ply_grp_member_ms  a
             inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
-        --    inner join ods_cthx_web_ply_bnfc partition(pt20191013000000) bn  on bn.c_app_no = b.c_app_no
-		-- where b.t_next_edr_bgn_tm > now() and bn.c_clnt_mrk = 1
 		where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0
 			and c_cert_no is not null and trim(c_cert_no)  <> '' 
 		union
@@ -116,12 +115,10 @@ from (
             ,b.c_app_no
 		    ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
 		    ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-		    ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
+		    ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有rpt_fxq_tb_ply_grp_member_ms.c_clnt_mrk
 		    ,43 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
 		from rpt_fxq_tb_ply_grp_member_ms  a
             inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
-        --    inner join ods_cthx_web_ply_bnfc partition(pt20191013000000) bn  on bn.c_app_no = b.c_app_no
-		-- where b.t_next_edr_bgn_tm > now() and bn.c_clnt_mrk = 1
 		where c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0
 			and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' 
 

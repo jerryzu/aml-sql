@@ -49,7 +49,7 @@ select
     a.c_ply_no as pol_no,-- 保单号
     a.c_app_no as app_no,-- 投保单号
     date_format(a.t_app_tm,'%Y%m%d') as ins_date,-- 投保日期
-    b.c_applicant_name as app_name,-- 投保人名称
+    b.c_acc_name as app_name,-- 投保人名称
     b.c_cst_no as app_cst_no,-- 投保人客户号
     case b.c_cert_cls
     when '100111' then 22 -- 税务登记证
@@ -103,18 +103,15 @@ select
     a.n_prm as pre_amt,-- 本期交保费金额
     -9999 as usd_amt,-- 折合美元金额
 	/* 现转标识 unpass*/   -- 10: 现金交保险公司; 11: 转账; 12: 现金缴款单(指客户向银行缴纳现金, 凭借银行开具的单据向保险机构办理交费业务); 13: 保险公司业务员代付。网银转账、银行柜面转账、POS刷卡、直接转账给总公司账户等情形, 应标识为转账。填写数字。
-    '' as tsf_flag,-- 现转标识
-	mny.c_payer_nme         as acc_name,-- 交费账号名称
-    mny.c_savecash_bank          as acc_no,-- 交费账号
-    mny.c_bank_nme	          as acc_bank,-- 交费账户开户机构名称
+    case a.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- d.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
+    a.acc_name         as acc_name,-- 交费账号名称
+    a.acc_no          as acc_no,-- 交费账号
+    a.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     a.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     a.c_edr_no as endorse_no,-- 批单号
     '20191013000000' pt
 from rpt_fxq_tb_ply_base_ms a
-    inner join ods_cthx_web_fin_prm_due partition(pt20191013000000) due on a.c_ply_no = due.c_ply_no
-    inner join ods_cthx_web_fin_cav_mny partition(pt20191013000000) mny on due.c_cav_no = mny.c_cav_pk_id
-
-	inner join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_ply_no=b.c_ply_no
+	inner join edw_cust_ply_party partition(pt20191013000000) b on a.c_ply_no=b.c_ply_no and b.c_biz_type in (21, 22)
 	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) c on a.c_edr_rsn_bundle_cde=c.c_rsn_cde and substr(a.c_prod_no,1,2)=c.c_kind_no
 	inner join ods_cthx_web_prd_prod partition(pt20191013000000) p on a.c_prod_no=p.c_prod_no
 	left join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde

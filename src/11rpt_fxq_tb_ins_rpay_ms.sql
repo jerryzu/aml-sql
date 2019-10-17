@@ -1,4 +1,4 @@
--- *********************************************************************************
+-- *********************************eee************************************************
 --  文件名称: .sql
 --  所属主题: 理赔
 --  功能描述: 从 
@@ -85,16 +85,13 @@ select
     '' as cur_code2,-- 币种
     null as pay_amt,-- 给付金额
     null as pay_usd_amt,-- 折合美元金额
-    '' as tsf_flag,-- 给付方式 10:现金;11:银行转账;12:其他
-
-	mny.c_payer_nme         as acc_name,-- 交费账号名称
-    mny.c_savecash_bank          as acc_no,-- 交费账号
-    mny.c_bank_nme	          as acc_bank,-- 交费账户开户机构名称
+    case a.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- d.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
+    a.acc_name         as acc_name,-- 交费账号名称
+    a.acc_no          as acc_no,-- 交费账号
+    a.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     a.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     '20191013000000' pt
 from rpt_fxq_tb_ply_base_ms a
-    inner join ods_cthx_web_fin_prm_due partition(pt20191013000000) due on a.c_ply_no = due.c_ply_no
-    inner join ods_cthx_web_fin_cav_mny partition(pt20191013000000) mny on due.c_cav_no = mny.c_cav_pk_id
 	left join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_app_no=b.c_app_no
 	left join edw_cust_ply_party_insured partition(pt20191013000000) i on a.c_app_no=i.c_app_no
 	left join edw_cust_ply_party_bnfc partition(pt20191013000000) d on  a.c_app_no=d.c_app_no
