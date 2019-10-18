@@ -56,3 +56,6 @@ from (select
         c_clnt_cde, t_crt_tm
 ) v
 where rank = 1;
+
+-- apply_date	投保日期
+-- accept_date	保单承保日期

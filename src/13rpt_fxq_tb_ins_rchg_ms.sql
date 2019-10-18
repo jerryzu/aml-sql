@@ -58,6 +58,6 @@ from rpt_fxq_tb_ply_base_ms m
     left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where e.c_rsn_cde in ('22','-J1','-Z1') and m.t_next_edr_bgn_tm > now()  
     and m.n_prm_var <> 0 --  测试此条件没有满足记录
-	-- and m.t_edr_bgn_tm between and 
+	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
 
 -- 本表提取除退保、加保、减保、理赔、给付、保单质押借款等以外的所有非支付类保全/批改业务，每一次保全业务生产一条记录。    

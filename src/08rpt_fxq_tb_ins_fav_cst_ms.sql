@@ -83,6 +83,7 @@ from rpt_fxq_tb_ply_base_ms m
 	inner join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no and i.c_biz_type in (31, 32, 33)
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() and a.c_clnt_mrk = 1
+	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
 union all
 /* 受益人部分提取*/
 select
@@ -115,3 +116,4 @@ from rpt_fxq_tb_ply_base_ms m
 	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_biz_type in (41, 42, 43) -- error
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() and a.c_clnt_mrk = 1
+	-- and m.t_edr_bgn_tm between {lastday} and {lastday}

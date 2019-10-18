@@ -25,10 +25,9 @@ insert into edw_cust_ply_insured_bnfc_tmp(
     c_insured_no,
     c_bnfc_no,
     c_clnt_mrk,
-    c_biz_type,
-    pt
+    c_biz_type
 )
-select 
+select distinct
     c_dpt_cde c_dpt_cde
     ,c_ply_no
     ,c_app_no
@@ -36,7 +35,6 @@ select
     ,concat('1', c_bnfc_no, mod(substr(c_bnfc_no, -7, 6), 9)) c_bnfc_no
     ,c_clnt_mrk
     ,c_biz_type
-    ,'20191013000000' pt
 from (
         select 
                 m.c_dpt_cde c_dpt_cde
@@ -62,10 +60,9 @@ insert into edw_cust_ply_insured_bnfc_tmp(
     c_insured_no,
     c_bnfc_no,
     c_clnt_mrk,
-    c_biz_type,
-    pt
+    c_biz_type
 )
-select 
+select distinct
     c_dpt_cde c_dpt_cde
     ,c_ply_no
     ,c_app_no
@@ -73,7 +70,6 @@ select
     ,concat('1', c_bnfc_no, mod(substr(c_bnfc_no, -7, 6), 9)) c_bnfc_no
     ,c_clnt_mrk
     ,c_biz_type
-    ,'20191013000000' pt
 from (
         select 
                 m.c_dpt_cde c_dpt_cde
@@ -140,7 +136,7 @@ SELECT
     m.c_app_no,
     m.c_clnt_mrk,
     m.c_biz_type,
-    m.pt
+    '20191013000000' pt
 FROM edw_cust_ply_insured_bnfc_tmp m
     inner join edw_cust_partys_info_tmp p1 on m.c_insured_no = p1.c_cst_no
     inner join edw_cust_partys_info_tmp p2 on m.c_bnfc_no = p2.c_cst_no;

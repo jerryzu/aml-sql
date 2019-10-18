@@ -157,3 +157,4 @@ from  rpt_fxq_tb_ply_base_ms m
 		) v on m.c_ply_no = v.c_ply_no -- error
     inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() 
+	-- and m.t_edr_bgn_tm between {lastday} and {lastday}

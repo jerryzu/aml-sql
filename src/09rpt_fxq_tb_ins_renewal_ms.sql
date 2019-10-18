@@ -118,6 +118,6 @@ from rpt_fxq_tb_ply_base_ms m
 	inner join ods_cthx_web_prd_prod partition(pt20191013000000) p on m.c_prod_no=p.c_prod_no
 	left join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where e.c_rsn_cde in ('07') and m.t_next_edr_bgn_tm > now() 
-	-- and m.t_edr_bgn_tm between and
+	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
 
 -- 本表数据范围为检查业务期限内，检查对象办理的所有的增加或追加保费、保额业务保单信息    

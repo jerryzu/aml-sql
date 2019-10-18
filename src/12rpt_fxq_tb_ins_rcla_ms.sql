@@ -128,6 +128,8 @@ from rpt_fxq_tb_ply_base_ms m
 	 inner join ods_cthx_web_clm_rpt partition(pt20191013000000) e on g.c_clm_no=e.c_clm_no
 	 inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
 where m.t_next_edr_bgn_tm > now()
+	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
+	
 -- 1.一份赔案涉及多个受益人或实际收款人的，相应生成多条记录。  
 -- 2.理赔日期为实际资金交易日期。
 -- 检查业务期限内，检查对象所有给付信息，每一笔业务生成一条完整的记录
