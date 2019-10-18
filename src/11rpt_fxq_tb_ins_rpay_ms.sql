@@ -12,6 +12,9 @@
 --  修改日期: 
 --  修改人: 
 --  修改内容：
+-- 说明：
+--   1.本表数据范围为检查业务期限内，检查对象所有给付信息，每一笔业务生成一条完整的记录。  
+--   2.本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。
 
 alter table rpt_fxq_tb_ins_rpay_ms truncate partition pt20191013000000;
 
@@ -54,46 +57,47 @@ INSERT INTO rpt_fxq_tb_ins_rpay_ms(
         pt
 )
 select
-    a.c_dpt_cde as company_codel,-- 机构网点代码
+    m.c_dpt_cde as company_codel,-- 机构网点代码
     co.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
     '' as company_code3,-- 保单归属机构网点代码
     '' as company_code4,-- 受理业务机构网点代码
-    a.c_ply_no as pol_no,-- 保单号
-    a.c_app_no as app_no,-- 投保单号
-    date_format(a.t_app_tm,'%Y%m%d') as ins_date,-- 投保日期
-    date_format(a.t_insrnc_bgn_tm,'%Y%m%d') as eff_date,-- 合同生效日期
+    m.c_ply_no as pol_no,-- 保单号
+    m.c_app_no as app_no,-- 投保单号
+    date_format(m.t_app_tm,'%Y%m%d') as ins_date,-- 投保日期
+    date_format(m.t_insrnc_bgn_tm,'%Y%m%d') as eff_date,-- 合同生效日期
     '' as cur_code1,-- 币种
     null as pre_amt_all,-- 累计保费金额
     null as usd_amt_all,-- 累计保费折合美元金额
-    b.c_applicant_name as app_name,-- 投保人名称
-    b.c_cst_no as app_cst_no,-- 投保人客户号
-    b.c_cert_cde as app_id_no,-- 投保人证件号码
-    b.c_clnt_mrk as app_cus_pro,-- 投保人客户类型 11:个人;12:单位;
-    i.c_insured_name as ins_name,-- 被保险人客户名称
+    a.c_acc_name as app_name,-- 投保人名称
+    a.c_cst_no as app_cst_no,-- 投保人客户号
+    a.c_cert_cde as app_id_no,-- 投保人证件号码
+    a.c_clnt_mrk as app_cus_pro,-- 投保人客户类型 11:个人;12:单位;
+    i.c_acc_name as ins_name,-- 被保险人客户名称
     i.c_cst_no as ins_cst_no,-- 被保险人客户号
     i.c_cert_cde as ins_id_no,-- 被保险人证件号码
     i.c_clnt_mrk as ins_cus_pro,-- 被保险人客户类型 11:个人;12:单位;
-    d.c_bnfc_name as benefit_name,-- 受益人名称
-    d.c_cert_cde   as benefit_id_no,-- 受益人身份证件号码
+    b.c_acc_name as benefit_name,-- 受益人名称
+    b.c_cert_cde   as benefit_id_no,-- 受益人身份证件号码
     '' as benefit_pro,-- 受益人类型 11:个人;12:单位;
-    -- d.c_app_relation as relation_1,-- 投保人被保人之间的关系,无此字段
-    '' as relation_1,-- 投保人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;17:其他;
-    '' as relation_2,-- 受益人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;18:其他;
+    -- b.c_app_relation as relation_1,-- 投保人被保人之间的关系,无此字段
+    a.c_app_ins_relation as relation_1,-- 投保人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;17:其他;
+    i.c_ins_bnf_relation as relation_2,-- 受益人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;18:其他;
     '' as pay_type,-- 给付类型  11:生产金给付;12:满期金给付;13:其他
     '' as rpay_date,-- 给付业务办理日期
     '' as pay_date,-- 资金交易日期
     '' as cur_code2,-- 币种
     null as pay_amt,-- 给付金额
     null as pay_usd_amt,-- 折合美元金额
-    case a.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- d.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
-    a.acc_name         as acc_name,-- 交费账号名称
-    a.acc_no          as acc_no,-- 交费账号
-    a.acc_bank	          as acc_bank,-- 交费账户开户机构名称
-    a.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
+    case m.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- b.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
+    m.acc_name         as acc_name,-- 交费账号名称
+    m.acc_no          as acc_no,-- 交费账号
+    m.acc_bank	          as acc_bank,-- 交费账户开户机构名称
+    m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     '20191013000000' pt
-from rpt_fxq_tb_ply_base_ms a
-	left join edw_cust_ply_party_applicant partition(pt20191013000000) b on a.c_app_no=b.c_app_no
-	left join edw_cust_ply_party_insured partition(pt20191013000000) i on a.c_app_no=i.c_app_no
-	left join edw_cust_ply_party_bnfc partition(pt20191013000000) d on  a.c_app_no=d.c_app_no
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
-where a.t_next_edr_bgn_tm > now() 
+from rpt_fxq_tb_ply_base_ms m
+	left join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no  and a.c_biz_type in (21, 22)
+	left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no  -- error
+	left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no -- error
+	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
+where m.t_next_edr_bgn_tm > now() 
+--   本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。

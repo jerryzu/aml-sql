@@ -12,6 +12,9 @@
 --  修改日期: 
 --  修改人: 
 --  修改内容：
+-- 说明：
+--   1.取出表六至表十三涉及的所有投保人、被保险人、受益人（受益人适用人身保险业务，财产保险业务无需提取）、实际领款人为单位时的客户身份信息，如涉及多个系统存储客户身份信息的，应分别从各系统取数，确保提供要素的完整性。
+--   2.一个单位客户存在多个控股股东或实际控制人的，每个控股股东或实际控制人生成一条记录。
 
 alter table rpt_fxq_tb_ins_unit_ms truncate partition pt20191013000000;
 
@@ -49,7 +52,7 @@ INSERT INTO rpt_fxq_tb_ins_unit_ms(
         pt
 )
 SELECT
-        a.c_dpt_cde as company_code1, -- 机构网点代码，内部的机构编码
+        u.c_dpt_cde as company_code1, -- 机构网点代码，内部的机构编码
         co.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
         c_cst_no	        cst_no	,
         date_format(t_open_time,'%Y%m%d')	        open_time	,
@@ -117,5 +120,5 @@ SELECT
         null	        code	,
         null	        sys_name	,
         '20191013000000' pt
-FROM edw_cust_units_info partition(pt20191013000000) a
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
+FROM edw_cust_units_info partition(pt20191013000000) u
+    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = u.c_dpt_cde

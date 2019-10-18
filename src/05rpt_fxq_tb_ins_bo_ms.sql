@@ -12,7 +12,9 @@
 --  修改日期: 
 --  修改人: 
 --  修改内容：
-
+--  说明： 
+--    1.取出表七、八、九、十一、十二、十三涉及的投保人、被保险人或受益人为非自然人的受益所有人信息。
+--    2.每个受益所有人增加一条记录。
 alter table rpt_fxq_tb_ins_bo_ms truncate partition pt20191013000000;
 
 INSERT INTO rpt_fxq_tb_ins_bo_ms(
@@ -59,7 +61,7 @@ select
     date_format(t_cert_end_date,'%Y%m%d') id_deadline5,-- 受益所有人证件有效期
     '@N'as sys_name,-- 系统名称,
     '20191013000000' pt
-from edw_cust_ply_party partition(pt20191013000000) a1
+from edw_cust_ply_party partition(pt20191013000000) a1 -- error about party
     inner join edw_cust_ply_party partition(pt20191013000000) a2 on a1.c_ply_no = a2.c_ply_no
     left join  edw_cust_units_info partition(pt20191013000000)  u on a1.c_cst_no = u.c_cst_no
     left join edw_cust_pers_info partition(pt20191013000000) p on a2.c_cst_no = p.c_cst_no
@@ -68,3 +70,5 @@ where a1.c_biz_type = 22 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 3
    and a1.c_clnt_mrk='0' -- 受益人没有客户类别区分,申请人有客户类别区分
    and a2.c_biz_type = 43 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
    and a2.c_clnt_mrk='1'
+
+/*这里只有投保人，还有被保人，受益人为非自然人时的，受益所有人信息*/   

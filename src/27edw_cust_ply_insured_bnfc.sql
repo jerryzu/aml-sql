@@ -39,17 +39,17 @@ select
     ,'20191013000000' pt
 from (
         select 
-                b.c_dpt_cde c_dpt_cde
-                ,concat(rpad(a.c_cert_typ, 6, '0') , rpad(a.c_cert_no, 18, '0'))  c_insured_no -- 被保人编码  
-                ,concat(rpad(a.c_bnfc_cert_typ, 6, '0') , rpad(a.c_bnfc_cert_no, 18, '0'))  c_bnfc_no -- 被保人编码  
-                ,b.c_ply_no
-                ,b.c_app_no
-                ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-                ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
+                m.c_dpt_cde c_dpt_cde
+                ,concat(rpad(gmb.c_cert_typ, 6, '0') , rpad(gmb.c_cert_no, 18, '0'))  c_insured_no -- 被保人编码
+                ,concat(rpad(gmb.c_bnfc_cert_typ, 6, '0') , rpad(gmb.c_bnfc_cert_no, 18, '0'))  c_bnfc_no -- 受益人编码
+                ,m.c_ply_no
+                ,m.c_app_no
+                ,date_format(m.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
+                ,date_format(greatest(m.t_insrnc_bgn_tm,m.t_udr_tm,coalesce(m.t_edr_bgn_tm,m.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
                 ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
                 ,null c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-        from rpt_fxq_tb_ply_member_ms  a
-                inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
+        from rpt_fxq_tb_ply_grp_member_ms  gmb
+                inner join rpt_fxq_tb_ply_base_ms m on gmb.c_app_no = m.c_app_no
         where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0 and c_cert_no is not null and trim(c_cert_no)  <> '' 
                 and c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0 and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' 
 ) v
@@ -76,18 +76,18 @@ select
     ,'20191013000000' pt
 from (
         select 
-                b.c_dpt_cde c_dpt_cde
+                m.c_dpt_cde c_dpt_cde
                 ,concat(rpad(i.c_certf_cls, 6, '0') , rpad(i.c_certf_cde, 18, '0'))  c_insured_no -- 被保人编码  
                 ,concat(rpad(b1.c_certf_cls, 6, '0') , rpad(b1.c_certf_cde, 18, '0'))  c_bnfc_no -- 被保人编码  
-                ,b.c_ply_no
-                ,b.c_app_no
-                ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-                ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
+                ,m.c_ply_no
+                ,m.c_app_no
+                ,date_format(m.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
+                ,date_format(greatest(m.t_insrnc_bgn_tm,m.t_udr_tm,coalesce(m.t_edr_bgn_tm,m.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
                 ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
                 ,9 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-        from rpt_fxq_tb_ply_base_ms b  
-                inner join rpt_fxq_tb_ply_insured_ms  i on b.c_app_no = i.c_app_no
-                inner join rpt_fxq_tb_ply_bnfc_ms  b1 on b.c_app_no = b1.c_app_no
+        from rpt_fxq_tb_ply_base_ms m  
+                inner join rpt_fxq_tb_ply_insured_ms  i on m.c_app_no = i.c_app_no
+                inner join rpt_fxq_tb_ply_bnfc_ms  b1 on m.c_app_no = b1.c_app_no
         where i.c_certf_cls is not null and trim(i.c_certf_cls)  <> '' and i.c_certf_cls REGEXP '[^0-9.]' = 0 and i.c_certf_cde is not null and trim(i.c_certf_cde)  <> '' 
                 and b1.c_certf_cls is not null and trim(b1.c_certf_cls)  <> '' and b1.c_certf_cls REGEXP '[^0-9.]' = 0 and b1.c_certf_cde is not null and trim(b1.c_certf_cde)  <> '' 
 ) v

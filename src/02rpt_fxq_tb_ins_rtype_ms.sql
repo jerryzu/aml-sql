@@ -12,6 +12,7 @@
 --  修改日期: 
 --  修改人: 
 --  修改内容：
+--  说明：  本表数据范围为检查对象所属法人机构全系统提供的所有金融服务（产品）（表六至表十三涉及的保险产品）,每种服务（产品）生成一条完整的记录。
 
 alter table rpt_fxq_tb_ins_rtype_ms truncate partition pt20191013000000;
 
@@ -24,28 +25,28 @@ INSERT INTO rpt_fxq_tb_ins_rtype_ms (
 	pt
 )
 select distinct co.head_no as head_no, -- 法人机构报告机构编码，央行统一分配
-	a.c_dpt_cde as company_code1, -- 机构网点代码，内部的机构编码
+	d.c_dpt_cde as company_code1, -- 机构网点代码，内部的机构编码
 	case 
-	when d.c_kind_no = '01' then '11'
-	when d.c_kind_no = '02' then '11'
-	when d.c_kind_no = '03' then '10'
-	when d.c_kind_no = '04' then '13'
-	when d.c_kind_no = '05' then '15'
-	when d.c_kind_no = '06' then '14'
-	when d.c_kind_no = '07' then '14'
-	when d.c_kind_no = '08' then '11'
-	when d.c_kind_no = '09' then '11'
-	when d.c_kind_no = '10' then '16'
-	when d.c_kind_no = '11' then '12'
-	when d.c_kind_no = '12' then '15'
-	when d.c_kind_no = '16' then '16'
+	when k.c_kind_no = '01' then '11'
+	when k.c_kind_no = '02' then '11'
+	when k.c_kind_no = '03' then '10'
+	when k.c_kind_no = '04' then '13'
+	when k.c_kind_no = '05' then '15'
+	when k.c_kind_no = '06' then '14'
+	when k.c_kind_no = '07' then '14'
+	when k.c_kind_no = '08' then '11'
+	when k.c_kind_no = '09' then '11'
+	when k.c_kind_no = '10' then '16'
+	when k.c_kind_no = '11' then '12'
+	when k.c_kind_no = '12' then '15'
+	when k.c_kind_no = '16' then '16'
 	else '其他'
 	end as ins_type, -- 险种分类 10:车险;11:财产险;12:船货特险;13:责任保险;14:短期健康、意外保险;15:信用保证保险;16:农业保险;17:其他;如某一险种同时属于多累,需要同时列明,中间用";"隔开,如"10;11;12"
-	c.c_prod_no as ins_no, -- 险种代码
-	c.c_nme_cn as  ins_name, -- 险种名称
+	p.c_prod_no as ins_no, -- 险种代码
+	p.c_nme_cn as  ins_name, -- 险种名称
     '20191013000000' pt
-from ods_cthx_web_org_dpt partition(pt20191013000000) a 
-	inner join ods_cthx_web_org_dpt_map partition(pt20191013000000) b on a.c_dpt_cde=b.c_dpt_cde
-	left join ods_cthx_web_prd_prod partition(pt20191013000000) c on b.c_kind_no=c.c_kind_no
-	left join ods_cthx_web_prd_kind partition(pt20191013000000) d on c.c_kind_no=d.c_kind_no
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = a.c_dpt_cde
+from ods_cthx_web_org_dpt partition(pt20191013000000) d 
+	inner join ods_cthx_web_org_dpt_map partition(pt20191013000000) m on d.c_dpt_cde = m.c_dpt_cde
+	left join ods_cthx_web_prd_prod partition(pt20191013000000) p on m.c_kind_no = p.c_kind_no
+	left join ods_cthx_web_prd_kind partition(pt20191013000000) k on p.c_kind_no = k.c_kind_no
+    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on d.c_dpt_cde = co.company_code1
