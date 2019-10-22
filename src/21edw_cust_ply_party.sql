@@ -37,7 +37,7 @@ INSERT INTO ply_party_tmp(
     t_bgn_tm,
     t_end_tm,
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
-    ,c_app_ins_relation --  投保人、被保人之间的关系
+    c_app_ins_relation, --  投保人、被保人之间的关系
     c_biz_type,
     pt
 )
@@ -54,217 +54,26 @@ select  distinct
     ,t_bgn_tm 
     ,t_end_tm  
     ,c_clnt_mrk
-    ,c_app_ins_relation --  投保人、被保人之间的关系
+    ,c_rel_cde c_app_ins_relation --  投保人、被保人之间的关系
     ,c_biz_type
     ,'20191013000000' pt
-from (
-	select 
-        b.c_dpt_cde c_dpt_cde
-        ,concat(rpad(a.c_certf_cls, 6, '0') , rpad(a.c_certf_cde, 18, '0')) c_cst_no -- 投保人代码,投保人唯一客户代码
-        ,b.c_ply_no
-        ,b.c_app_no
-        ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-        ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-        ,a.c_clnt_mrk
-        ,a.c_rel_cde --  与被保人关系
-        ,case a.c_clnt_mrk when 1 then 21 when 0 then 22 end c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-	from rpt_fxq_tb_ply_applicant_ms  a
-	    inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
-	where b.t_next_edr_bgn_tm > now() 
-        and c_certf_cls is not null and trim(c_certf_cls)  <> '' and c_certf_cls REGEXP '[^0-9.]' = 0
-        and c_certf_cde is not null and trim(c_certf_cde)  <> '' 
-) v;
-
-INSERT INTO ply_party_tmp(
-    c_dpt_cde,
-    c_cst_no,
-    c_ply_no,
-    c_app_no,
-    t_bgn_tm,
-    t_end_tm,
-    c_clnt_mrk,
-    c_biz_type,
-    pt
-)
-select  distinct
-    c_dpt_cde c_dpt_cde
-    ,case 
-        when c_clnt_mrk = 1 then 
-            concat('1', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-        else
-            concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-    end c_cst_no
-    ,c_ply_no
-    ,c_app_no
-    ,t_bgn_tm 
-    ,t_end_tm  
-    ,c_clnt_mrk
-    ,c_biz_type
-    ,'20191013000000' pt
-from (
-    select b.c_dpt_cde c_dpt_cde
-        ,concat(rpad(a.c_certf_cls, 6, '0') , rpad(a.c_certf_cde, 18, '0'))  c_cst_no -- 客户号
-        ,b.c_ply_no
-        ,b.c_app_no
-        ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-        ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-        ,c_clnt_mrk
-        ,case a.c_clnt_mrk when 1 then 31 when 0 then 32 end c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-    from rpt_fxq_tb_ply_insured_ms a -- 被保人
-        inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
-    where b.t_next_edr_bgn_tm > now()
-        and c_certf_cls is not null and trim(c_certf_cls)  <> '' and c_certf_cls REGEXP '[^0-9.]' = 0
-        and c_certf_cde is not null and trim(c_certf_cde)  <> '' 
-) v;
-
-
-INSERT INTO ply_party_tmp(
-    c_dpt_cde,
-    c_cst_no,
-    c_ply_no,
-    c_app_no,
-    t_bgn_tm,
-    t_end_tm,
-    c_clnt_mrk,
-    c_ins_bnf_relation,	  --  被保险人与受益人之间的关系
-    c_biz_type,
-    pt
-)
-select  distinct
-    c_dpt_cde c_dpt_cde
-    ,case 
-        when c_clnt_mrk = '12' then 
-            concat('1', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-        else
-            concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-    end c_cst_no
-    ,c_ply_no
-    ,c_app_no
-    ,t_bgn_tm 
-    ,t_end_tm  
-    ,case c_clnt_mrk when '12' then 1 else 0 end c_clnt_mrk  -- 客户分类,0 法人，1 个人
-    ,c_ins_bnf_relation	  --  与被保人关系 -> 被保险人与受 益人之间的关 系
-    ,case c_clnt_mrk when '12' then 41 else 42 end c_biz_type
-    ,'20191013000000' pt
-from (
+from (	
         select 
                 b.c_dpt_cde c_dpt_cde
-                ,concat(rpad(a.c_certf_cls, 6, '0') , rpad(a.c_certf_cde, 18, '0')) c_cst_no-- 受益人代码,受益人唯一客户代码
+                , c_cst_no -- 投保人代码,投保人唯一客户代码
                 ,b.c_ply_no
                 ,b.c_app_no
                 ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
                 ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-                ,substr(a.c_certf_cls, 1, 2) c_clnt_mrk --  c_clnt_mrk无值,这里判断身份证类型,
-                ,c_rel_cde c_ins_bnf_relation	  --  与被保人关系 -> 被保险人与受 益人之间的关 系
-                ,41 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-        from rpt_fxq_tb_ply_bnfc_ms  a
+                ,a.c_clnt_mrk
+                ,null c_rel_cde --  与被保人关系
+                ,c_per_biztype c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
+        from  x_edw_cust_pers_units_info  a
                 inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
         where b.t_next_edr_bgn_tm > now() 
-                and c_certf_cls is not null and trim(c_certf_cls)  <> '' and c_certf_cls REGEXP '[^0-9.]' = 0
-                and c_certf_cde is not null and trim(c_certf_cde)  <> ''
+                and c_cert_cls is not null and trim(c_cert_cls)  <> '' and c_cert_cls REGEXP '[^0-9.]' = 0
+                and c_cert_cde is not null and trim(c_cert_cde)  <> ''
 ) v;
-
-/* 团单被保人与受益人 */
-INSERT INTO ply_party_tmp(
-    c_dpt_cde,
-    c_cst_no,
-    c_ply_no,
-    c_app_no,
-    t_bgn_tm,
-    t_end_tm,
-    c_clnt_mrk,
-    c_biz_type,
-    pt
-)
-select  distinct
-    c_dpt_cde c_dpt_cde
-    ,case 
-        when c_clnt_mrk = 1 then 
-            concat('1', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-        else
-            concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-    end c_cst_no
-    ,c_ply_no
-    ,c_app_no
-    ,t_bgn_tm 
-    ,t_end_tm  
-    ,c_clnt_mrk  -- 客户分类,0 法人，1 个人
-    ,c_biz_type
-    ,'20191013000000' pt
-from (
-		select b.c_dpt_cde c_dpt_cde
-		    ,concat(rpad(a.c_cert_typ, 6, '0') , rpad(a.c_cert_no, 18, '0'))  c_cst_no -- 被保人编码  
-            ,b.c_ply_no
-            ,b.c_app_no
-		    ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-		    ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-		    ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有rpt_fxq_tb_ply_grp_member_ms.c_clnt_mrk
-		    ,33 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-		from rpt_fxq_tb_ply_grp_member_ms  a
-            inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
-		where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0
-			and c_cert_no is not null and trim(c_cert_no)  <> '' 
-		union
-		select b.c_dpt_cde c_dpt_cde
-		    ,concat(rpad(a.c_bnfc_cert_typ, 6, '0') , rpad(a.c_bnfc_cert_no, 18, '0'))  c_cst_no -- 被保人编码  
-            ,b.c_ply_no
-            ,b.c_app_no
-		    ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-		    ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-		    ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有rpt_fxq_tb_ply_grp_member_ms.c_clnt_mrk
-		    ,43 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-		from rpt_fxq_tb_ply_grp_member_ms  a
-            inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
-		where c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0
-			and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' 
-) v;
-
-/*
-收款人
-*/
-
-INSERT INTO ply_party_tmp(
-    c_dpt_cde,
-    c_cst_no,
-    c_ply_no,
-    c_app_no,
-    t_bgn_tm,
-    t_end_tm,
-    c_clnt_mrk,
-    c_biz_type,
-    pt
-)
-select  distinct
-    c_dpt_cde c_dpt_cde
-    ,case 
-        when c_clnt_mrk = 1 then 
-            concat('1', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-        else
-            concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
-    end c_cst_no
-    ,c_ply_no
-    ,c_app_no
-    ,t_bgn_tm 
-    ,t_end_tm  
-    ,c_clnt_mrk
-    ,c_biz_type
-    ,'20191013000000' pt
-from (
-		select b.c_dpt_cde c_dpt_cde
-		    ,concat(rpad(a.c_card_type, 6, '0') , rpad(a.c_card_cde, 18, '0')) c_cst_no -- 收款人编号
-            ,b.c_ply_no
-            ,null c_app_no
-		    ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
-		    ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-		    ,1 c_clnt_mrk   -- 客户分类,0 法人，1 个人
-		    ,10 c_biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-		from ods_cthx_web_clm_bank  partition(pt20191013000000)  a
-		    inner join ods_cthx_web_clm_main partition(pt20191013000000) c on a.c_clm_no = c.c_clm_no
-            inner join rpt_fxq_tb_ply_base_ms b on c.c_ply_no = b.c_ply_no
-		where c_card_type is not null and trim(c_card_type)  <> '' and c_card_type REGEXP '[^0-9.]' = 0
-			and c_card_cde is not null and trim(c_card_cde)  <> ''  
-) v;
-
 
 drop table if exists ply_party_info_tmp;
 
