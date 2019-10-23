@@ -77,7 +77,7 @@ select
 	concat(rpad(i.c_cert_cls, 6, '0') , rpad(i.c_cert_cde, 18, '0')) as insbene_cst_no,-- 被保险人或受益人客户号
 	i.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
     '20191013000000' pt
-from rpt_fxq_tb_ply_base_ms m
+from x_rpt_fxq_tb_ins_rpol_gpol m
 	-- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
 	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_biz_type in (21, 22)  
 	inner join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no and i.c_biz_type in (31, 32, 33)
@@ -111,7 +111,7 @@ select
 	concat(rpad(b.c_cert_cls, 6, '0') , rpad(b.c_cert_cde, 18, '0')) as insbene_cst_no,-- 被保险人或受益人客户号
 	b.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
 	'20191013000000' pt	
-from rpt_fxq_tb_ply_base_ms m
+from x_rpt_fxq_tb_ins_rpol_gpol m
 	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_biz_type in (21, 22) -- error
 	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_biz_type in (41, 42, 43) -- error
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde

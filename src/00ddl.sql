@@ -10,6 +10,7 @@ CREATE TABLE `rpt_fxq_manual_company_ms` (
 (PARTITION pt20190822000000 VALUES LESS THAN ('20190822999999') ENGINE = InnoDB,
  PARTITION pt20191013000000 VALUES LESS THAN ('20191013999999') ENGINE = InnoDB,
  PARTITION future VALUES LESS THAN ('99991231999999') ENGINE = InnoDB) */
+--   c_cert_ok varchar(1) character set utf8 collate utf8_bin default null comment '证件有效',
 
 DROP TABLE IF EXISTS x_edw_cust_pers_units_info;
 CREATE TABLE x_edw_cust_pers_units_info (

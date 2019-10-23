@@ -17,6 +17,20 @@
 --    2.每个受益所有人增加一条记录。
 alter table rpt_fxq_tb_ins_bo_ms truncate partition pt20191013000000;
 
+/*
+目前非自然人的受益所有人在业务系统中没有实现
+drop table  if exists unitply;
+create temporary table unitply
+select c_ply_no, c_app_no
+from edw_cust_ply_party
+where c_clnt_mrk = 0   -- 客户分类,0 法人，1 个人
+        and c_biz_type in ('21','31','33','41','43') --  保单人员参于类型:投保人:21,    被保人:31,    受益人:41,    团单被保人:33,    团单受益人:43,    收款人:11
+group by c_ply_no, c_app_no
+
+select *
+from x_rpt_fxq_tb_ins_rpol_gpol m
+        inner join unitply up on m.c_app_no = up.c_app_no
+*/
 INSERT INTO rpt_fxq_tb_ins_bo_ms(
         company_code1,
         company_code2,

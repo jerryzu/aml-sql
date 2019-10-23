@@ -16,6 +16,10 @@
 --   1.本表数据范围为检查业务期限内，检查对象所有理赔信息，每一笔理赔支付业务生成一条完整的记录，一份赔案涉及多个受益人或实际收款人的，相应生成多条记录。  
 --   2.理赔日期为实际资金交易日期。
 
+--  表十二	tb_ins_rcla	检查期所有理赔业务保单
+
+--  投保人，被保人，受益人，[投保人、被保人关系|被保人、受益人关系]，理赔申请人，实际领款人,理赔金额[实际领款人领取的理赔款项金额]，
+
 alter table rpt_fxq_tb_ins_rcla_ms truncate partition pt20191013000000;
 
 INSERT INTO rpt_fxq_tb_ins_rcla_ms(
@@ -69,10 +73,12 @@ select
 	m.c_app_no as app_no,-- 投保单号
 	date_format(m.t_app_tm,'%Y%m%d') as ins_date,-- 投保日期
 	date_format(m.t_insrnc_bgn_tm,'%Y%m%d') as eff_date,-- 合同生效日期
+--以下不从这里取
 	a.c_applicant_name as app_name,-- 投保人名称
 	a.c_cst_no as app_cst_no,-- 投保人客户号
 	a.c_cert_cde as app_id_no,-- 投保人证件号码
 	a.c_clnt_mrk as app_cus_pro,-- 投保人客户类型 11:个人;12:单位;
+	
 	i.c_insured_name as ins_name,-- 被保险人客户名称
 	i.c_cst_no as ins_cst_no,-- 被保险人客户号
 	i.c_cert_cde as ins_id_no,-- 被保险人证件号码
@@ -82,6 +88,7 @@ select
 	'' as benefit_type,-- 受益人类型 11:个人;12:单位;
 	i.c_app_relation as relation_1,-- 投保人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;17:其他;
 	'' as relation_2,-- 受益人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;18:其他;
+--	
 	e.c_rptman_nme as cla_app_name,-- 理赔申请人名称 11:居民身份证或临时身份证;12:军人或武警身份证件;13:港澳居民来往内地通行证,台湾居民来往大陆通行证或其他有效旅游证件;14:港澳台居民居住证;15:外国公民护照;16:户口簿;17:出生证;18:其他类个人身份证件;21:营业执照;22:其他,
 	'' as  cla_id_type,-- 理赔申请人身份证件类型
 	'' as  cla_id_no,-- 理赔申请人身份证件号码
@@ -118,13 +125,10 @@ select
 	g.c_id_card as acc_id_no,-- 实际领款人身份证件号码
 	cm.c_clm_no as receipt_no,-- 作业流水号,唯一标识号	
     '20191013000000' pt
-from rpt_fxq_tb_ply_base_ms m
-	 inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_ply_no=a.c_ply_no   and a.c_biz_type in (21, 22)
-	 inner join edw_cust_ply_party_insured partition(pt20191013000000) i on m.c_app_no=i.c_app_no -- error 
-	 inner join edw_cust_ply_party_bnfc partition(pt20191013000000) b on  m.c_ply_no=b.c_ply_no -- error 多个受益人相应生成多条记录
+from x_rpt_fxq_tb_ins_rpol_gpol m
 	 inner join ods_cthx_web_clm_main partition(pt20191013000000) cm on m.c_ply_no = cm.c_ply_no
 	 inner join ods_cthx_web_clmnv_endcase partition(pt20191013000000) u on cm.c_clm_no = u.c_clm_no
-	 inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on u.c_clm_no=g.c_clm_no
+	 inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on u.c_clm_no=g.c_clm_no -- 领款人，
 	 inner join ods_cthx_web_clm_rpt partition(pt20191013000000) e on g.c_clm_no=e.c_clm_no
 	 inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
 where m.t_next_edr_bgn_tm > now()

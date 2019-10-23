@@ -1,6 +1,6 @@
 /*
-drop table `rpt_fxq_tb_ply_base_ms` ;
-create table `rpt_fxq_tb_ply_base_ms` (
+drop table `x_rpt_fxq_tb_ins_rpol_gpol` ;
+create table `x_rpt_fxq_tb_ins_rpol_gpol` (
   `c_dpt_cde` varchar(30) character set utf8 collate utf8_bin default null comment '机构代码 department no',
   `c_cha_subtype` varchar(30) character set utf8 collate utf8_bin default null comment '渠道子类',
   `c_brkr_cde` varchar(30) character set utf8 collate utf8_bin default null comment '代理人/经纪人 agent/broker no',
@@ -28,6 +28,7 @@ create table `rpt_fxq_tb_ply_base_ms` (
   `c_grp_mrk` varchar(1) character set utf8 collate utf8_bin default '0' comment '团单标志( 0 个单; 1 团单) group insurance flag'
 ) engine=innodb default charset=utf8
 */
+truncate table  x_rpt_fxq_tb_ins_rpol_gpol;
 
 drop table  if exists pay;
 create temporary table pay
@@ -69,8 +70,7 @@ from (select
 ) v
 where rank = 1;
 
-truncate table  rpt_fxq_tb_ply_base_ms;
-insert into rpt_fxq_tb_ply_base_ms(
+insert into x_rpt_fxq_tb_ins_rpol_gpol(
         c_dpt_cde	--  机构代码 Department No
         ,c_cha_subtype	--  渠道子类
         ,c_brkr_cde	 --  代理人/经纪人 Agent/Broker No

@@ -44,7 +44,7 @@ select
     ,c_app_no
     ,21 c_per_biztype	 -- 	保单人员参于类型:投保人:21,被保人:31,受益人:41,团单被保人:33,团单受益人:43,收款人:11
     -- c_cst_no已经编码由身份证类型6位,身份证号码18位组成,这里校验码取倒数第7位至倒数第2位与9取MOD
-	,case c_clnt_mrk 
+    ,case c_clnt_mrk 
 	when 1 then  -- 客户分类,0 法人，1 个人
                concat('1', concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), mod(substr(concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), -7, 6), 9)) 
 	when 0 then   -- 客户分类,0 法人，1 个人

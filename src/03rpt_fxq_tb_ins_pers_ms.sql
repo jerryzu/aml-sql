@@ -89,3 +89,4 @@ SELECT
     '20191013000000' pt
 FROM edw_cust_pers_info partition(pt20191013000000) p
     left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = p.c_dpt_cde
+-- 受益人（受益人适用人身保险业务，财产保险业务无需提取）

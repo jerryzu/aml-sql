@@ -144,7 +144,7 @@ SELECT
     m.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     '20191013000000'    pt
-from  rpt_fxq_tb_ply_base_ms m
+from  x_rpt_fxq_tb_ins_rpol_gpol m
     inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_biz_type = 22 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人
     inner join ods_cthx_web_ply_ent_tgt partition(pt20191013000000) t
         on m.c_ply_no=t.c_ply_no

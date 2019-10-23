@@ -37,6 +37,10 @@
 
 alter table rpt_fxq_tb_ins_rpol_ms truncate partition pt20191013000000;
 
+/*
+
+*/
+
 INSERT INTO rpt_fxq_tb_ins_rpol_ms(
         company_code1,
         company_code2,
@@ -209,7 +213,7 @@ select
     	m.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     	m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
         '20191013000000'		pt
-from rpt_fxq_tb_ply_base_ms m -- error about party
+from x_rpt_fxq_tb_ins_rpol_gpol m -- error about party
         inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_biz_type = 21  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
         inner join edw_cust_ply_party   partition(pt20191013000000) i on m.c_ply_no =i.c_ply_no and i.c_biz_type = 31  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人        
         left join edw_cust_ply_party  partition(pt20191013000000) b on m.c_ply_no =b.c_ply_no and b.c_biz_type in (41, 43)  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人

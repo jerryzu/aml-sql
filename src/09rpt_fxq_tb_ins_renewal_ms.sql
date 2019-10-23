@@ -112,7 +112,7 @@ select
     m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     m.c_edr_no as endorse_no,-- 批单号
     '20191013000000' pt
-from rpt_fxq_tb_ply_base_ms m
+from x_rpt_fxq_tb_ins_rpol_gpol m
 	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_ply_no=a.c_ply_no and a.c_biz_type in (21, 22)
 	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) e on m.c_edr_rsn_bundle_cde=e.c_rsn_cde and substr(m.c_prod_no,1,2)=e.c_kind_no
 	inner join ods_cthx_web_prd_prod partition(pt20191013000000) p on m.c_prod_no=p.c_prod_no
