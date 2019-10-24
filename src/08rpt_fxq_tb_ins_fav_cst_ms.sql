@@ -54,7 +54,7 @@ select
         else 
         null-- 其它
     end	as insbene_cus_pro,-- 被保人或受益人类型 11：个人；12：单位
-	case a.c_app_insured_relation
+	case a.c_app_ins_relation
 	when '601001' then '12' -- 配偶
 	when '601002' then '13' -- 父母
 	when '601003' then '14' -- 子女
@@ -74,13 +74,13 @@ select
 	end  as relation,-- 投保人、被保人之间的关系 11：本单位；12本单位董事、监事或高级管理人员；13：雇佣或劳务；14：其他
 	'' as fav_type,-- 受益人标识 11：法定受益人；12非法定受益人 insfav_type=12时填写
 	i.c_acc_name as name,-- 被保人或受益人名称
-	concat(rpad(i.c_cert_cls, 6, '0') , rpad(i.c_cert_cde, 18, '0')) as insbene_cst_no,-- 被保险人或受益人客户号
+    i.c_cst_no as insbene_cst_no,-- 被保险人或受益人客户号
 	i.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
     '20191013000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
 	-- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_biz_type in (21, 22)  
-	inner join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no and i.c_biz_type in (31, 32, 33)
+	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype in (21, 22)  
+	inner join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no and i.c_per_biztype in (31, 32, 33)
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() and a.c_clnt_mrk = 1
 	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
@@ -112,8 +112,8 @@ select
 	b.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
 	'20191013000000' pt	
 from x_rpt_fxq_tb_ins_rpol_gpol m
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_biz_type in (21, 22) -- error
-	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_biz_type in (41, 42, 43) -- error
+	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype in (21, 22) -- error
+	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_per_biztype in (41, 42, 43) -- error
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() and a.c_clnt_mrk = 1
 	-- and m.t_edr_bgn_tm between {lastday} and {lastday}

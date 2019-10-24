@@ -1,45 +1,4 @@
--- *********************************************************************************
---  文件名称: 06rpt_fxq_tb_ins_rpol_ms.sql
---  所属主题: 理赔
---  功能描述: 从 ods_cthx_web_ply_base
---  ods_cthx_web_app_insured
---  edw_cust_ply_party_applicant
---  edw_cust_ply_party_insured   
---  edw_cust_ply_party_bnfc
---  rpt_fxq_tb_company_ms
---  ods_cthx_web_fin_prm_due
---  ods_cthx_web_fin_cav_mny 表提取数据
---            导入到 理赔案件表(rpt_fxq_tb_ins_rpol_ms) 表
---  创建者: yhwang
---  输入: ods_cthx_web_ply_base
---  ods_cthx_web_app_insured
---  edw_cust_ply_party_applicant
---  edw_cust_ply_party_insured   
---  edw_cust_ply_party_bnfc
---  rpt_fxq_tb_company_ms
---  ods_cthx_web_fin_prm_due
---  ods_cthx_web_fin_cav_mny 
---  输出: rpt_fxq_tb_ins_rpol_ms 
---  创建日期: 2017/6/7
---  修改日志: 
---  修改日期: 
---  修改人: 
---  修改内容：
---  "说明：
---   1.本表数据范围为：  
---     （1 ）检查业务期限（投保日期和生效日期任一满足检查业务期限）内，检查对象承保的投保人为自然人的所有保单信息；  
---      以及（2）表九、十一、十二业务中投保人为自然人的保单信息（如某份保单在检查期内发生了多次涉及表九、十一、十二的业务，只需要数据提取当日的保单信息即可），如同一份保单同时符合（1）和（2）的条件，则分别提取多条记录。  
---   2.当一份保单涉及多个被保险人时，每个被保险人按照本表结构生成一条记录。  
---   3.指定受益人为法定受益人中的一人或若干人时，不填写本表受益人相关字段。  
---   4.单个被保险人涉及多个指定受益人（非法定受益人）的，合并生成一条记录，指定受益人的姓名、身份证件号码用半角隔开。  
---   5.对同一份保单、多个被保险人、每个被保险人涉及多个险种情形，每个险种单独生成一条记录。 "
-
-
 alter table rpt_fxq_tb_ins_rpol_ms truncate partition pt20191013000000;
-
-/*
-
-*/
 
 INSERT INTO rpt_fxq_tb_ins_rpol_ms(
         company_code1,
@@ -89,7 +48,7 @@ select
         m.c_dpt_cde as company_code3,-- 保单归属机构网点代码
         m.c_ply_no as  pol_no,-- 保单号
         m.c_app_no as app_no,-- 投保单号
-        case when m.c_edr_type in ('2','3') or m.t_insrnc_bgn_tm > str_to_date('20191013', '%y%m%d') or m.t_insrnc_end_tm < str_to_date('20191013', '%y%m%d') then 12 else 11 end as ins_state,-- 保单状态 --edr_type in ('2','3') or  T_INSRNC_END_TM<=date then 终止 else 有效
+        case when m.c_edr_type in ('2','3') or m.t_insrnc_bgn_tm > str_to_date('20191013', '%Y%m%d') or m.t_insrnc_end_tm < str_to_date('20191013', '%Y%m%d') then 12 else 11 end as ins_state,-- 保单状态 --edr_type in ('2','3') or  T_INSRNC_END_TM<=date then 终止 else 有效
 		case m.c_cha_subtype 
 				-- 财产保险销售渠道:11:个人代理;12:保险代理机构或经济机构;13:银邮代理;14:网销(本机构);15:电销;16:农村网点;17:营业网点;18:第三方平台;19:其他;
 				when '0A0' then 17	--	营业网点
@@ -129,10 +88,10 @@ select
         18 -- 其它
         end as app_id_type,-- 投保人身份证件类型
         a.c_cert_cde as app_id_no,-- 投保人证件号码
-        i.c_insured_name as ins_name,-- 被保险人名称
-        i.c_insured_no as ins_cst_no,-- 被保险人客户号
+        i.c_ins_name as ins_name,-- 被保险人名称
+        i.c_ins_no as ins_cst_no,-- 被保险人客户号
 		/* 被保险人证件号码 unpass*/  -- 个人填写身份证件号码, 单位按表4License字段要求填写。
-        i.c_insured_cert_cde as ins_id_no,-- 被保险人证件号码
+        i.c_ins_cert_cde as ins_id_no,-- 被保险人证件号码
 		/* 被保险人客户类型 unpass*/   -- 11: 个人; 12: 单位客户。填写数字。
 		case i.c_ins_clnt_mrk
         when '1' then '11' -- 11:个人
@@ -140,7 +99,7 @@ select
         else 
         null-- 其它
         end	as ins_cus_pro,-- 被保险人客户类型 11:个人;12:单位
-        case a.c_app_ins_relation 
+        case a.c_app_ins_rel
         -- select concat('when ''', c_cde, ''' then '' '' -- ',  c_cnm) from web_bas_comm_code partition(pt20191013000000) where c_par_cde = '601' order by c_cde 
         -- 11: 本人； 12：配偶； 13：父母； 14：子女 15：其他近亲属 16 雇佣或劳务 17：其他  --tb_ins_rpay  tb_ins_rpol
         when '601001' then '12' -- 配偶
@@ -215,7 +174,7 @@ select
     	m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
         '20191013000000'		pt
 from x_rpt_fxq_tb_ins_rpol_gpol m -- error about party
-        inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_biz_type = 21  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
+        inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_per_biztype = 21  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
         inner join s_rpt_fxq_tb_ins_rpol_ms i on m.c_ply_no =i.c_ply_no 
         inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() 

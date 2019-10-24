@@ -40,7 +40,7 @@ INSERT INTO rpt_fxq_tb_ins_rpay_ms(
         ins_cus_pro,
         benefit_name,
         benefit_id_no,
-        benefit_pro,
+        benefit_cus_pro,
         relation_1,
         relation_2,
         pay_type,
@@ -78,7 +78,7 @@ select
     i.c_clnt_mrk as ins_cus_pro,-- 被保险人客户类型 11:个人;12:单位;
     b.c_acc_name as benefit_name,-- 受益人名称
     b.c_cert_cde   as benefit_id_no,-- 受益人身份证件号码
-    '' as benefit_pro,-- 受益人类型 11:个人;12:单位;
+    '' as benefit_cus_pro,-- 受益人类型 11:个人;12:单位;
     -- b.c_app_relation as relation_1,-- 投保人被保人之间的关系,无此字段
     a.c_app_ins_relation as relation_1,-- 投保人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;17:其他;
     i.c_ins_bnf_relation as relation_2,-- 受益人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;18:其他;
@@ -95,9 +95,9 @@ select
     m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     '20191013000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
-	left join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no  and a.c_biz_type in (21, 22)
-	left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no  -- error
-	left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no -- error
+	left join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no  and a.c_per_biztype in (21, 22)
+	/* left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no  -- error */
+	/* left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no -- error */
 	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
 where m.t_next_edr_bgn_tm > now() 
 	-- and m.t_edr_bgn_tm between {lastday} and {lastday}

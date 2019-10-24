@@ -89,10 +89,10 @@ from (
 		    ,c_work_dpt  -- 工作单位
 		    ,21 biz_type -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
 		from  x_edw_cust_pers_units_info a
-                        inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
+                        inner join  ods_cthx_web_ply_base partition(pt20191013000000)  b on a.c_app_no = b.c_app_no
 		where b.t_next_edr_bgn_tm > now() and a.c_clnt_mrk = 1 -- 客户分类,0 法人，1 个人
 			and c_cert_cls is not null and trim(c_cert_cls)  <> '' and c_cert_cls REGEXP '[^0-9.]' = 0
-			and c_cert_cde is not null and trim(c_cert_cde)  <> '' 
+			and c_cert_cde is not null and trim(c_cert_cde)  <> ''  and left(c_cert_cde, 17)  REGEXP '[^0-9.]' = 0 
 		) vw
 	where c_cst_no is not null and c_cst_no REGEXP '[^0-9.]' = 0
 	group by c_cst_no

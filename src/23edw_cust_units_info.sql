@@ -14,7 +14,7 @@
 --  修改内容：
 
 SELECT @@global.group_concat_max_len;
-SET SESSION group_concat_max_len=10240;
+SET SESSION group_concat_max_len=102400;
 alter table edw_cust_units_info truncate partition pt20191013000000;
 
 insert into edw_cust_units_info(
@@ -50,7 +50,7 @@ insert into edw_cust_units_info(
 )
 select 
     substring_index(c_dpt_cde,',',1) c_dpt_cde
-    ,concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
+    ,c_cst_no 
     ,substring_index(c_certf_cls,',',1) c_certf_cls
     ,substring_index(c_certf_cde,',',1) c_certf_cde
     ,t_open_time t_open_time
@@ -81,10 +81,6 @@ select
 from (
 	select     
 	    group_concat(c_dpt_cde order by c_per_biztype)  c_dpt_cde
-        -- 1.个人(1),团体(2)	2.身份证类型	3.身份证号	4.序列号(忽略)	5.校验位(1位)
-        -- c_cst_no已经处理了2. 3. 4.暂时忽略, 这里只需要处理1.5.
-        -- 开始(1)标识为个人
-        -- c_cst_no已经编码由身份证类型6位,身份证号码18位组成,这里校验码取倒数第7位至倒数第2位与9取MOD
         ,c_cst_no
 	    ,group_concat(c_cert_cls order by c_per_biztype)  c_certf_cls
 	    ,group_concat(c_cert_cde order by c_per_biztype)  c_certf_cde
@@ -143,7 +139,7 @@ from (
             ,null n_reg_amt
             ,c_per_biztype -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
         from x_edw_cust_pers_units_info a
-            inner join rpt_fxq_tb_ply_base_ms b on a.c_app_no = b.c_app_no
+            inner join ods_cthx_web_ply_base partition(pt20191013000000)   b on a.c_app_no = b.c_app_no
         where a.c_clnt_mrk = 0 -- 客户分类,0 法人，1 个人
 			and c_cert_cls is not null and trim(c_cert_cls)  <> '' and c_cert_cls REGEXP '[^0-9.]' = 0
 			and c_cert_cde is not null and trim(c_cert_cde)  <> '' 
