@@ -82,6 +82,7 @@ INSERT INTO rpt_fxq_tb_ins_rpol_ms(
         receipt_no,
         pt
 )
+
 select 
         m.c_dpt_cde as company_codel,-- 机构网点代码
         co.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
@@ -128,12 +129,12 @@ select
         18 -- 其它
         end as app_id_type,-- 投保人身份证件类型
         a.c_cert_cde as app_id_no,-- 投保人证件号码
-        i.c_acc_name as ins_name,-- 被保险人名称
-        i.c_cst_no as ins_cst_no,-- 被保险人客户号
+        i.c_insured_name as ins_name,-- 被保险人名称
+        i.c_insured_no as ins_cst_no,-- 被保险人客户号
 		/* 被保险人证件号码 unpass*/  -- 个人填写身份证件号码, 单位按表4License字段要求填写。
-        i.c_cert_cde as ins_id_no,-- 被保险人证件号码
+        i.c_insured_cert_cde as ins_id_no,-- 被保险人证件号码
 		/* 被保险人客户类型 unpass*/   -- 11: 个人; 12: 单位客户。填写数字。
-		case i.c_clnt_mrk
+		case i.c_ins_clnt_mrk
         when '1' then '11' -- 11:个人
         when '0' then '12' -- 12:单位
         else 
@@ -162,10 +163,10 @@ select
 		/* 受益人标识 unpass*/  -- 11: 法定受益人; 12: 指定受益人填写数字。
         '' as legal_type,-- 受益人标识  11:法定受益人;12:制定受益人;
 		/* 受益人类型 unpass*/  -- 11: 个人; 12: 单位客户受益人标识为法定受益人的一人或若干人时, 不填写本字段, 下同。填写数字。
-        '' as benefit_cus_pro,-- 受益人类型 11:个人;12:单位客户;受益人为法定受益人的一人或若干人时不填写本字段
-        b.c_acc_name as  benefit_name,-- 受益人名称 受益人为法定受益人的一人或若干人时不填写本字段
-        b.c_cst_no as  benefit_cst_no,-- 受益人客户号
-        b.c_cert_cde as benefit_id_no,-- 受益人身份证号码
+        i.c_bnfc_clnt_mrk as benefit_cus_pro,-- 受益人类型 11:个人;12:单位客户;受益人为法定受益人的一人或若干人时不填写本字段
+        i.c_bnfc_name as  benefit_name,-- 受益人名称 受益人为法定受益人的一人或若干人时不填写本字段
+        i.c_bnfc_no as  benefit_cst_no,-- 受益人客户号
+        i.c_bnfc_cert_cde as benefit_id_no,-- 受益人身份证号码
         m.c_prod_no as ins_no,-- 险种代码 
         case m.c_prm_cur 
         when  '01' then 'CNY' -- 人民币
@@ -215,11 +216,11 @@ select
         '20191013000000'		pt
 from x_rpt_fxq_tb_ins_rpol_gpol m -- error about party
         inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_biz_type = 21  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
-        inner join edw_cust_ply_party   partition(pt20191013000000) i on m.c_ply_no =i.c_ply_no and i.c_biz_type = 31  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人        
-        left join edw_cust_ply_party  partition(pt20191013000000) b on m.c_ply_no =b.c_ply_no and b.c_biz_type in (41, 43)  -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
+        inner join s_rpt_fxq_tb_ins_rpol_ms i on m.c_ply_no =i.c_ply_no 
         inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where m.t_next_edr_bgn_tm > now() 
 	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
+
 
 --   3.指定受益人为法定受益人中的一人或若干人时，不填写本表受益人相关字段。  
 --   4.单个被保险人涉及多个指定受益人（非法定受益人）的，合并生成一条记录，指定受益人的姓名、身份证件号码用半角隔开。  

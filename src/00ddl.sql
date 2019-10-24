@@ -1,10 +1,10 @@
-CREATE TABLE `rpt_fxq_manual_company_ms` (
-  `head_no` varchar(20) DEFAULT NULL COMMENT '法人机构报告机构编码',
-  `company_code1` varchar(20) DEFAULT NULL COMMENT '机构网点代码',
-  `company_code2` varchar(16) DEFAULT NULL COMMENT '金融机构编码',
-  `company_name` varchar(160) DEFAULT NULL COMMENT '机构名称',
-  `bord_flag` varchar(2) DEFAULT NULL COMMENT '境内外标识',
-  `pt` varchar(15) DEFAULT NULL COMMENT '分区字段'
+CREATE TABLE rpt_fxq_manual_company_ms (
+  head_no varchar(20) DEFAULT NULL COMMENT '法人机构报告机构编码',
+  company_code1 varchar(20) DEFAULT NULL COMMENT '机构网点代码',
+  company_code2 varchar(16) DEFAULT NULL COMMENT '金融机构编码',
+  company_name varchar(160) DEFAULT NULL COMMENT '机构名称',
+  bord_flag varchar(2) DEFAULT NULL COMMENT '境内外标识',
+  pt varchar(15) DEFAULT NULL COMMENT '分区字段'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机构对照表'
 /*!50500 PARTITION BY RANGE  COLUMNS(pt)
 (PARTITION pt20190822000000 VALUES LESS THAN ('20190822999999') ENGINE = InnoDB,
@@ -51,3 +51,55 @@ CREATE TABLE x_edw_cust_pers_units_info (
   c_clnt_addr varchar(200) character set utf8 collate utf8_bin default null comment '地址',
   c_work_dpt varchar(100) character set utf8 collate utf8_bin default null comment '工作单位'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE s_rpt_fxq_tb_ins_rpol_ms;
+CREATE TABLE s_rpt_fxq_tb_ins_rpol_ms
+(
+    c_dpt_cde VARCHAR(20) COMMENT '机构网点代码',
+    c_ply_no VARCHAR(50) COMMENT '保单编号',
+    c_app_no VARCHAR(50) COMMENT '申请单号，批改申请单号',
+    c_ins_no VARCHAR(32) COMMENT '被保人客户编号',
+    c_ins_clnt_mrk varchar(1) COMMENT '被保人客户分类,0 法人，1 个人',
+    c_ins_name VARCHAR(40) COMMENT '被保人名称',
+    c_ins_cert_cls VARCHAR(8) COMMENT '被保人身份证件种类',
+    c_ins_cert_cde VARCHAR(50) COMMENT '被保人身份证件号码',
+    c_bnfc_no VARCHAR(32) COMMENT '受益人客户编号',
+    c_bnfc_clnt_mrk varchar(1) COMMENT '受益人客户分类,0 法人，1 个人',
+    c_bnfc_name VARCHAR(40) COMMENT '受益人名称',
+    c_bnfc_cert_cls VARCHAR(8) COMMENT '受益人身份证件种类',
+    c_bnfc_cert_cde VARCHAR(50) COMMENT '受益人身份证件号码',
+    c_grp_mrk varchar(1)  COMMENT '团单标志( 0 个单; 1 团单) Group Insurance Flag',
+    c_app_relation VARCHAR(30) COMMENT '与被保人关系',
+    pt VARCHAR(15) COMMENT '分区字段',
+    INDEX edw_cust_ply_party_insured_pk (c_ply_no, pt),
+    INDEX edw_cust_ply_party_insured_pk1 (c_app_no, pt)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='保单相关方关系表';
+
+drop table x_rpt_fxq_tb_ins_rpol_gpol;
+create table x_rpt_fxq_tb_ins_rpol_gpol (
+  c_dpt_cde varchar(30) character set utf8 collate utf8_bin default null comment '机构代码 department no',
+  c_cha_subtype varchar(30) character set utf8 collate utf8_bin default null comment '渠道子类',
+  c_brkr_cde varchar(30) character set utf8 collate utf8_bin default null comment '代理人/经纪人 agent/broker no',
+  c_ply_no varchar(50) character set utf8 collate utf8_bin default null comment '保单号 policy no',
+  c_app_no varchar(50) character set utf8 collate utf8_bin not null comment '申请单号',
+  c_prod_no varchar(6) character set utf8 collate utf8_bin default null comment '产品代码 product code',
+  t_insrnc_bgn_tm datetime default null comment '保险起期 policy effective date',
+  t_insrnc_end_tm datetime default null comment '保险止期 policy expire date',
+  t_app_tm datetime default null comment '投保日期 applying time',
+  t_edr_app_tm datetime default null comment '批改申请日期',
+  t_edr_bgn_tm datetime default null comment '批改生效起期',
+  t_next_edr_bgn_tm datetime default null comment '批改生效起期 beginning of successive edorsement  effective time ',
+  t_udr_tm datetime default null comment '核保日期 underwrite time',
+  c_edr_type varchar(30) character set utf8 collate utf8_bin default null comment '批改类型,1 一般批改，2 注销，3退保  4、组合批改  5 满期返还  9 批单撤销',
+  c_edr_no varchar(50) character set utf8 collate utf8_bin default null comment '批单号',
+  c_edr_rsn_bundle_cde varchar(50) character set utf8 collate utf8_bin default null comment '批改原因或组合代码',
+  c_prm_cur varchar(30) character set utf8 collate utf8_bin default null comment '保费币种 currency of premium',
+  n_prm decimal(20,2) default null comment '保费合计 premium',
+  n_prm_var decimal(20,2) default null comment '保费变化，批单保费上一批单（保单）保费',
+  c_pay_mde_cde varchar(30) character set utf8 collate utf8_bin default null comment '付款方式',
+  acc_name varchar(100) default null comment '缴款人',
+  acc_no varchar(30) default null comment '存现银行',
+  acc_bank varchar(100) default null comment '客户银行名称',
+  c_edr_ctnt text character set utf8 collate utf8_bin comment '批文内容',
+  c_grp_mrk varchar(1) character set utf8 collate utf8_bin default '0' comment '团单标志( 0 个单; 1 团单) group insurance flag'
+) engine=innodb default charset=utf8;

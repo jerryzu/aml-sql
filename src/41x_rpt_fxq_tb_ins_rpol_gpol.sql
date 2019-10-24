@@ -1,33 +1,4 @@
-/*
-drop table `x_rpt_fxq_tb_ins_rpol_gpol` ;
-create table `x_rpt_fxq_tb_ins_rpol_gpol` (
-  `c_dpt_cde` varchar(30) character set utf8 collate utf8_bin default null comment '机构代码 department no',
-  `c_cha_subtype` varchar(30) character set utf8 collate utf8_bin default null comment '渠道子类',
-  `c_brkr_cde` varchar(30) character set utf8 collate utf8_bin default null comment '代理人/经纪人 agent/broker no',
-  `c_ply_no` varchar(50) character set utf8 collate utf8_bin default null comment '保单号 policy no',
-  `c_app_no` varchar(50) character set utf8 collate utf8_bin not null comment '申请单号',
-  `c_prod_no` varchar(6) character set utf8 collate utf8_bin default null comment '产品代码 product code',
-  `t_insrnc_bgn_tm` datetime default null comment '保险起期 policy effective date',
-  `t_insrnc_end_tm` datetime default null comment '保险止期 policy expire date',
-  `t_app_tm` datetime default null comment '投保日期 applying time',
-  `t_edr_app_tm` datetime default null comment '批改申请日期',
-  `t_edr_bgn_tm` datetime default null comment '批改生效起期',
-  `t_next_edr_bgn_tm` datetime default null comment '批改生效起期 beginning of successive edorsement  effective time ',
-  `t_udr_tm` datetime default null comment '核保日期 underwrite time',
-  `c_edr_type` varchar(30) character set utf8 collate utf8_bin default null comment '批改类型,1 一般批改，2 注销，3退保  4、组合批改  5 满期返还  9 批单撤销',
-  `c_edr_no` varchar(50) character set utf8 collate utf8_bin default null comment '批单号',
-  `c_edr_rsn_bundle_cde` varchar(50) character set utf8 collate utf8_bin default null comment '批改原因或组合代码',
-  `c_prm_cur` varchar(30) character set utf8 collate utf8_bin default null comment '保费币种 currency of premium',
-  `n_prm` decimal(20,2) default null comment '保费合计 premium',
-  `n_prm_var` decimal(20,2) default null comment '保费变化，批单保费上一批单（保单）保费',
-  `c_pay_mde_cde` varchar(30) character set utf8 collate utf8_bin default null comment '付款方式',
-  `acc_name` varchar(100) default null comment '缴款人',
-  `acc_no` varchar(30) default null comment '存现银行',
-  `acc_bank` varchar(100) default null comment '客户银行名称',
-  `c_edr_ctnt` text character set utf8 collate utf8_bin comment '批文内容',
-  `c_grp_mrk` varchar(1) character set utf8 collate utf8_bin default '0' comment '团单标志( 0 个单; 1 团单) group insurance flag'
-) engine=innodb default charset=utf8
-*/
+
 truncate table  x_rpt_fxq_tb_ins_rpol_gpol;
 
 drop table  if exists pay;
