@@ -30,9 +30,8 @@
 
 
 ## 受益人客户类型全为空
-## 暂没有处理投保人,被保人,受益人关系在保单相关方中??????
+## 投保人,被保人关系:个单没有对应数据,团单没有此字段
 ## 05rpt_fxq_tb_ins_bo_ms(reserves).sql原提取规则不正确??
 ## 11rpt_fxq_tb_ins_rpay_ms\(abandoned\).sql 不正确,但是人寿险不需要上报
-## 12rpt_fxq_tb_ins_rcla_ms.sql 需要确认,因为这里的被保,受益均不从保业取,从理赔取??
-
+## 12rpt_fxq_tb_ins_rcla_ms.sql 需要确认,因为这里的被保,受益均不从保单取,从理赔取??
 ## 13rpt_fxq_tb_ins_rchg_ms.sql没有满足条件的记录 m.n_prm_var <> 0 --  测试此条件没有满足记录

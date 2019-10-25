@@ -1,5 +1,5 @@
 alter table edw_cust_ply_party truncate partition pt20191013000000;
-
+-- select * from edw_cust_ply_party
 drop table  if exists ply_party_tmp;
 create temporary table ply_party_tmp select * from edw_cust_ply_party where 1 = 2;
 
@@ -14,8 +14,7 @@ INSERT INTO ply_party_tmp(
     t_bgn_tm,
     t_end_tm,
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
-    c_per_biztype,
-    pt
+    c_per_biztype
 )
 select  distinct
     c_dpt_cde c_dpt_cde
@@ -29,7 +28,6 @@ select  distinct
     ,t_end_tm  
     ,c_clnt_mrk
     ,c_per_biztype
-    ,'20191013000000' pt
 from (	
         select 
                 b.c_dpt_cde c_dpt_cde
@@ -67,6 +65,44 @@ select
 	c_certf_cde
 from edw_cust_units_info  partition(pt20191013000000);
 
+drop table if exists ply_party_tmp_ins;
+
+create temporary table ply_party_tmp_ins 
+select c_app_no, max(c_ins_app_rel) c_ins_app_rel 
+from ply_party_tmp  
+where c_per_biztype in (31,32)
+group by c_app_no;
+
+drop table if exists ply_party_tmp2;
+create temporary table ply_party_tmp2 select * from edw_cust_ply_party where 1 = 2;
+INSERT INTO ply_party_tmp2(
+    c_dpt_cde,
+    c_cst_no,
+    c_ply_no,
+    c_app_no,
+    c_app_ins_rel, -- 投保人与被保人之间的关系
+    c_bnfc_ins_rel, -- 受益人与被保险人之间的关系
+    c_ins_app_rel, -- 被保险人与投保人之间的关系
+    t_bgn_tm,
+    t_end_tm,
+    c_clnt_mrk,   -- 客户分类,0 法人，1 个人
+    c_per_biztype
+)
+select 
+    l.c_dpt_cde,
+    l.c_cst_no,
+    l.c_ply_no,
+    l.c_app_no,
+    ifnull(r.c_ins_app_rel, l.c_ins_app_rel) c_app_ins_rel, -- 投保人与被保人之间的关系
+	l.c_bnfc_ins_rel, -- 受益人与被保险人之间的关系
+    l.c_ins_app_rel, -- 被保险人与投保人之间的关系
+    l.t_bgn_tm,
+    l.t_end_tm,
+    l.c_clnt_mrk,   -- 客户分类,0 法人，1 个人
+    l.c_per_biztype
+from ply_party_tmp l
+	left join ply_party_tmp_ins r on l.c_app_no = r.c_app_no ;
+
 insert into edw_cust_ply_party(
     c_dpt_cde	--  机构网点代码
     ,c_ply_no	--  保单编号
@@ -100,5 +136,5 @@ SELECT distinct
     m.c_clnt_mrk,	--  客户类型
     m.c_per_biztype,	--  客户角色
     '20191013000000'	--  分区字段
-FROM ply_party_tmp m
+FROM ply_party_tmp2 m
     inner join ply_party_info_tmp p1 on m.c_cst_no = p1.c_cst_no;
