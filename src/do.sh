@@ -99,3 +99,5 @@ sed "s/{lastday}/$lastday/g" 17rpt_fxq_tb_sus_report_ms.sql>work/17rpt_fxq_tb_su
 source work/14rpt_fxq_tb_ins_risk_new_ms.sql;
 source work/15rpt_fxq_tb_ins_risk_ms.sql;
 source work/16rpt_fxq_tb_lar_report_ms.sql;
+
+ mysql -uroot -pgemini -Dtpedw< 06rpt_fxq_tb_ins_rpol_ms.sql 
