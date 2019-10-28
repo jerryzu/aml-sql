@@ -53,7 +53,7 @@ insert into x_rpt_fxq_tb_ins_rpol_gpol(
         ,t_app_tm	--  投保日期 Applying Time
         ,t_edr_app_tm	--  批改申请日期
         ,t_edr_bgn_tm	--  批改生效起期
-        ,t_next_edr_bgn_tm	--  批改生效起期 Beginning of Successive Edorsement  Effective Time 
+        ,t_next_edr_udr_tm	--  批改生效起期 Beginning of Successive Edorsement  Effective Time 
         ,t_udr_tm       --   核保日期
         ,c_edr_type	--  批改类型,1 一般批改，2 注销，3退保  4、组合批改  5 满期返还  9 批单撤销
         ,c_edr_no	--  批单号
@@ -69,32 +69,32 @@ insert into x_rpt_fxq_tb_ins_rpol_gpol(
         ,c_grp_mrk -- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
 )
 select 
-	a.c_dpt_cde
-	, a.c_cha_subtype 
-	, a.c_brkr_cde-- 销售渠道名称
-	, a.c_ply_no -- 保单号
-	, a.c_app_no-- 投保单号
-	, a.c_prod_no -- 险种代码 
-	, a.t_insrnc_bgn_tm -- 合同生效日期
-	, a.t_insrnc_end_tm
-	, a.t_app_tm  -- 投保日期
-	, a.t_edr_app_tm -- 申请日期
-	, a.t_edr_bgn_tm -- 变更或批改日期
-	, a.t_next_edr_bgn_tm
-        , a.t_udr_tm  -- 核保日期
-	, a.c_edr_type
-	, a.c_edr_no -- 批单号
-	, a.c_edr_rsn_bundle_cde-- 业务类型 11:退保;12:减保;13:保单部分领取;14:保单贷款;15:其他
-	, a.c_prm_cur 
-	, a.n_prm -- 本期交保费金额
-	, a.n_prm_var -- 测试此条件没有满足记录
+	b.c_dpt_cde
+	, b.c_cha_subtype 
+	, b.c_brkr_cde-- 销售渠道名称
+	, b.c_ply_no -- 保单号
+	, b.c_app_no-- 投保单号
+	, b.c_prod_no -- 险种代码 
+	, b.t_insrnc_bgn_tm -- 合同生效日期
+	, b.t_insrnc_end_tm
+	, b.t_app_tm  -- 投保日期
+	, b.t_edr_app_tm -- 申请日期
+	, b.t_edr_bgn_tm -- 变更或批改日期
+	, b.t_next_edr_udr_tm
+        , b.t_udr_tm  -- 核保日期
+	, b.c_edr_type
+	, b.c_edr_no -- 批单号
+	, b.c_edr_rsn_bundle_cde-- 业务类型 11:退保;12:减保;13:保单部分领取;14:保单贷款;15:其他
+	, b.c_prm_cur 
+	, b.n_prm -- 本期交保费金额
+	, b.n_prm_var -- 测试此条件没有满足记录
         /* 现转标识 unpass*/  -- 10: 现金交保险公司; 11: 转账; 12: 现金缴款单(指客户向银行缴纳现金, 凭借银行开具的单据向保险机构办理交费业务); 13: 保险公司业务员代付。网银转账、银行柜面转账、POS刷卡、直接转账给总公司账户等情形, 应标识为转账。填写数字。
         , p.c_pay_mde_cde	--  付款方式
         , p.acc_name -- 交费账号名称
         , p.acc_no -- 交费账号
         , p.acc_bank -- 交费账户开户机构名称
-	, a.c_edr_ctnt -- 变更内容摘要
-        , a.c_grp_mrk -- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
-from  ods_cthx_web_ply_base partition(pt20191013000000)  a
-     left join pay1 p on a.c_app_no = p.c_app_no    
-where a.t_next_edr_bgn_tm > now();
+	, b.c_edr_ctnt -- 变更内容摘要
+        , b.c_grp_mrk -- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
+from  ods_cthx_web_ply_base partition(pt20191013000000)  b
+     left join pay1 p on b.c_app_no = p.c_app_no    
+where b.t_next_edr_udr_tm > now();

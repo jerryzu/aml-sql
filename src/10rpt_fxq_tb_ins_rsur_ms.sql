@@ -103,7 +103,7 @@ from x_rpt_fxq_tb_ins_rpol_gpol m
 	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_ply_no=a.c_ply_no and a.c_per_biztype in (21, 22)
 	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) e on m.c_edr_rsn_bundle_cde=e.c_rsn_cde and substr(m.c_prod_no,1,2)=e.c_kind_no
 	left join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where e.c_rsn_cde in ('08','s1','s2') and m.t_next_edr_bgn_tm > now() 
+where e.c_rsn_cde in ('08','s1','s2') and m.t_next_edr_udr_tm > now() 
 	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
 
 --  退费类业务包括退保、减保、万能险部分领取、保单贷款等业务    

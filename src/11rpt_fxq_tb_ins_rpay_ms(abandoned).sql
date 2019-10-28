@@ -99,6 +99,6 @@ from x_rpt_fxq_tb_ins_rpol_gpol m
 	/* left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no  -- error */
 	/* left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no -- error */
 	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
-where m.t_next_edr_bgn_tm > now() 
+where m.t_next_edr_udr_tm > now() 
 	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
 --   本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。

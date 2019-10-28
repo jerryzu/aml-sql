@@ -44,3 +44,13 @@ tb_ins_rpol: 指定受益人为法定受益人中的一人或若干人时不报
 	, a.t_edr_bgn_tm -- 变更或批改日期
 	, a.t_next_edr_bgn_tm
         , a.t_udr_tm  -- 核保日期
+
+
+svn cat --username zuxh --password zuxh svn://10.19.0.22/edw/08src/alidata/edwproject/taskfile/sql/cdm_fin_pay_dd.sql > cdm_fin_pay_dd.sql
+svn cat --username zuxh --password zuxh svn://10.19.0.22/edw/08src/alidata/edwproject/taskfile/sql/cdm_fin_prm_dd.sql > cdm_fin_prm_dd.sql
+svn cat --username zuxh --password zuxh svn://10.19.0.22/edw/08src/alidata/edwproject/taskfile/sql/cdm_fin_clm_dd.sql > cdm_fin_clm_dd.sql
+svn cat --username zuxh --password zuxh svn://10.19.0.22/edw/08src/alidata/edwproject/taskfile/sql/adm_stat_financial_exp_ms.sql > adm_stat_financial_exp_ms.sql
+ls cdm_fin_pay_dd.sql cdm_fin_prm_dd.sql adm_stat_financial_exp_ms.sql cdm_fin_clm_dd.sql
+
+2.清除本地缓存帐号信息
+rm -rf ~/.subversion/auth
