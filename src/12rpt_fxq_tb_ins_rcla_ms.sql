@@ -126,9 +126,10 @@ select
 	cm.c_clm_no as receipt_no,-- 作业流水号,唯一标识号	
     '20191013000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m -- 8472
-	inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_per_biztype in (21, 22) -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人
-	inner join edw_cust_ply_party   partition(pt20191013000000) i on m.c_ply_no =i.c_ply_no and i.c_per_biztype in (21, 22) -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人
-	inner join edw_cust_ply_party   partition(pt20191013000000) b on m.c_ply_no =b.c_ply_no and b.c_per_biztype in (21, 22) -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 41: 受益人, 42: 法人受益人, 43: 间接受益人, 44: 法人间接受益人
+    --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
+	inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_per_biztype in (21, 22) 
+	inner join edw_cust_ply_party   partition(pt20191013000000) i on m.c_ply_no =i.c_ply_no and i.c_per_biztype in (31, 32) 
+	inner join edw_cust_ply_party   partition(pt20191013000000) b on m.c_ply_no =b.c_ply_no and b.c_per_biztype in (41, 42,43,44) 
 	inner join ods_cthx_web_clm_main partition(pt20191013000000) cm on m.c_ply_no = cm.c_ply_no -- 理赔主表  1194
 	inner join ods_cthx_web_clm_rpt partition(pt20191013000000) e on cm.c_clm_no=e.c_clm_no -- 理赔申请人（理赔号唯一)  1172
 	inner join ods_cthx_web_clm_accdnt partition(pt20191013000000) ac on cm.c_clm_no = ac.c_clm_no -- 出险表   1205	

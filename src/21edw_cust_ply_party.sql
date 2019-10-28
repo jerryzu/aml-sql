@@ -14,7 +14,7 @@ INSERT INTO ply_party_tmp(
     t_bgn_tm,
     t_end_tm,
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
-    c_per_biztype
+    c_per_biztype 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 )
 select  distinct
     c_dpt_cde c_dpt_cde
@@ -27,7 +27,7 @@ select  distinct
     ,t_bgn_tm 
     ,t_end_tm  
     ,c_clnt_mrk
-    ,c_per_biztype
+    ,c_per_biztype 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 from (	
         select 
                 b.c_dpt_cde c_dpt_cde
@@ -40,7 +40,7 @@ from (
 				,c_app_ins_rel -- 投保人与被保人之间的关系
 				,c_bnfc_ins_rel -- 受益人与被保险人之间的关系
 				,c_ins_app_rel -- 被保险人与投保人之间的关系
-                ,c_per_biztype c_per_biztype -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
+                ,c_per_biztype --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
         from  x_edw_cust_pers_units_info  a
                 inner join ods_cthx_web_ply_base partition(pt20191013000000)  b on a.c_app_no = b.c_app_no
         where b.t_next_edr_udr_tm > now() 
@@ -70,7 +70,7 @@ drop table if exists ply_party_tmp_ins;
 create temporary table ply_party_tmp_ins 
 select c_app_no, max(c_ins_app_rel) c_ins_app_rel 
 from ply_party_tmp  
-where c_per_biztype in (31,32)
+where c_per_biztype in (31,32) 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 group by c_app_no;
 
 drop table if exists ply_party_tmp2;
@@ -86,7 +86,7 @@ INSERT INTO ply_party_tmp2(
     t_bgn_tm,
     t_end_tm,
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
-    c_per_biztype
+    c_per_biztype 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 )
 select 
     l.c_dpt_cde,
@@ -117,7 +117,7 @@ insert into edw_cust_ply_party(
     ,t_bgn_tm	--  保险起期
     ,t_end_tm	--  保险止期
     ,c_clnt_mrk	--  客户类型
-    ,c_per_biztype	--  客户角色
+    ,c_per_biztype	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
     ,pt	--  分区字段
 )
 SELECT distinct
@@ -134,7 +134,7 @@ SELECT distinct
     m.t_bgn_tm,	--  保险起期
     m.t_end_tm,	--  保险止期
     m.c_clnt_mrk,	--  客户类型
-    m.c_per_biztype,	--  客户角色
+    m.c_per_biztype,		--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
     '20191013000000'	--  分区字段
 FROM ply_party_tmp2 m
     inner join ply_party_info_tmp p1 on m.c_cst_no = p1.c_cst_no;

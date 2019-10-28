@@ -95,6 +95,7 @@ select
     m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
     '20191013000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
+    --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 	left join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no  and a.c_per_biztype in (21, 22)
 	/* left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no  -- error */
 	/* left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no -- error */
