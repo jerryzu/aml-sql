@@ -1,3 +1,5 @@
+DROP TABLE rpt_fxq_manual_company_ms;
+
 CREATE TABLE rpt_fxq_manual_company_ms (
   head_no varchar(20) DEFAULT NULL COMMENT '法人机构报告机构编码',
   company_code1 varchar(20) DEFAULT NULL COMMENT '机构网点代码',
@@ -5,11 +7,9 @@ CREATE TABLE rpt_fxq_manual_company_ms (
   company_name varchar(160) DEFAULT NULL COMMENT '机构名称',
   bord_flag varchar(2) DEFAULT NULL COMMENT '境内外标识',
   pt varchar(15) DEFAULT NULL COMMENT '分区字段'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机构对照表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机构对照表'
 /*!50500 PARTITION BY RANGE  COLUMNS(pt)
-(PARTITION pt20190822000000 VALUES LESS THAN ('20190822999999') ENGINE = InnoDB,
- PARTITION pt20191013000000 VALUES LESS THAN ('20191013999999') ENGINE = InnoDB,
- PARTITION future VALUES LESS THAN ('99991231999999') ENGINE = InnoDB) */
+(PARTITION future VALUES LESS THAN ('99991231999999') ENGINE = InnoDB) */;
 
 INSERT INTO rpt_fxq_manual_company_ms (head_no, company_code1, company_code2, company_name, bord_flag, pt) VALUES ('030013304020046', '99000000', 'F1008933000019', '太平科技保险总公司', '10', '20190918000000');
 INSERT INTO rpt_fxq_manual_company_ms (head_no, company_code1, company_code2, company_name, bord_flag, pt) VALUES ('030013304020046', '33000000', 'F1008933000020', '浙江分公司', '10', '20190918000000');
@@ -35,6 +35,7 @@ INSERT INTO rpt_fxq_manual_company_ms (head_no, company_code1, company_code2, co
 INSERT INTO rpt_fxq_manual_company_ms (head_no, company_code1, company_code2, company_name, bord_flag, pt) VALUES ('030013304020046', '99740000', 'F1008933000019', '客户服务部（虚拟）', '10', '20190918000000');
 INSERT INTO rpt_fxq_manual_company_ms (head_no, company_code1, company_code2, company_name, bord_flag, pt) VALUES ('030013304020046', '99750000', 'F1008933000019', '公估公司（虚拟）', '10', '20190918000000');
 INSERT INTO rpt_fxq_manual_company_ms (head_no, company_code1, company_code2, company_name, bord_flag, pt) VALUES ('030013304020046', '99750001', 'F1008933000019', '民太安', '10', '20190918000000');
+
 
 DROP TABLE IF EXISTS x_edw_cust_pers_units_info;
 
@@ -165,78 +166,89 @@ alter table tpedw.x_edw_cust_pers_units_info add index xedwcustpersunitsinfo_ix_
 
 
 /***************************/
-DROP TABLE IF EXISTS `ods_cthx_web_clm_accdnt`;
+DROP TABLE IF EXISTS ods_cthx_web_clm_accdnt;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ods_cthx_web_clm_accdnt` (
-  `c_ins_acc_pk_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '出险信息表ID',
-  `c_clm_no` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '赔案号',
-  `c_insured_cde` varchar(50) DEFAULT NULL COMMENT '被保人编码',
-  `c_insured_nme` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '被保人名称',
-  `c_sex` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '性别',
-  `n_age` decimal(3,0) DEFAULT NULL COMMENT '年龄',
-  `c_cert_typ` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证件类型',
-  `c_cert_no` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证件号码',
-  `c_occup_cde` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '职业',
-  `t_accdnt_tm` datetime NOT NULL COMMENT '出险时间',
-  `c_accdnt_typ` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '险因类型',
-  `c_accdnt_rsn` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '出险原因',
-  `c_accdnt_rsnname` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '查勘出险原因名称',
-  `c_accdnt_place` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '出险地点',
-  `c_accdnt_proc` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '出险经过',
-  `n_rpt_amt` decimal(20,2) DEFAULT NULL COMMENT '报损金额',
-  `c_rpt_cur` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报损金额币种',
-  `c_remark` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '备注',
-  `t_rpt_accdnt_tm` datetime NOT NULL COMMENT '报案出险时间',
-  `c_rpt_accdnt_typ` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报案时录入的险因类型',
-  `c_rpt_accdnt_rsnname` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报案出险原因名称',
-  `c_rpt_accdnt_rsn` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '报案出险原因',
-  `c_rpt_accdnt_place` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '报案出险地点',
-  `c_rpt_accdnt_proc` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '报案时录入的出险经过',
-  `c_crt_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '创建人员',
-  `t_crt_tm` datetime NOT NULL COMMENT '创建时间',
-  `c_upd_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '修改人员',
-  `t_upd_tm` datetime NOT NULL COMMENT '修改时间',
-  `c_trans_mrk` varchar(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '迁移标志',
-  `t_trans_tm` datetime DEFAULT NULL COMMENT '迁移时间',
-  `n_disaster_rpt_amt` decimal(20,2) DEFAULT NULL COMMENT '成灾估损金额',
-  `n_nogain_rpt_amt` decimal(20,2) DEFAULT NULL COMMENT '绝产估损金额',
-  `c_rpt_accdnt_with_rsn` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报案伴随原因',
-  `n_yl1` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '承保农户数',
-  `n_yl2` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '受益农户数',
-  `n_yl3` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '死亡赔偿金额',
-  `n_yl4` bigint(22) DEFAULT NULL COMMENT '预计赔付金额',
-  `n_yl5` bigint(22) DEFAULT NULL COMMENT '承保数量',
-  `n_yl6` bigint(22) DEFAULT NULL COMMENT '赔付死亡数量',
-  `n_yl7` bigint(22) DEFAULT NULL COMMENT '赔付扑杀数量',
-  `n_yl8` bigint(22) DEFAULT NULL COMMENT '总扑杀数量',
-  `t_dead` datetime DEFAULT NULL COMMENT '死亡时间',
-  `n_dead_num` bigint(22) DEFAULT NULL COMMENT '总死亡数',
-  `n_calam_area1` bigint(22) DEFAULT NULL COMMENT '受灾面积',
-  `n_calam_area2` bigint(22) DEFAULT NULL COMMENT '成灾面积',
-  `n_nogain_area3` bigint(22) DEFAULT NULL COMMENT '其中绝产面积',
-  `c_is_injury` varchar(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '是否人伤',
-  `n_psn_num` decimal(4,0) DEFAULT NULL COMMENT '人数',
-  `c_hospital` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '医院',
-  `c_cost_proc` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '施救过程',
-  `c_instant_delay` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '即时、延时报案标识',
-  `c_huge_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '巨灾编码',
-  `c_huge_mrk` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '0否、1是',
-  `c_yl1` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '保单身份',
-  `t_date_birth` datetime DEFAULT NULL COMMENT '出生日期',
-  `c_province` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '省份',
-  `c_city` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '城市',
-  `c_county` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '县',
-  `c_injury_reason_code` varchar(7) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '损伤外部原因代码',
-  `c_grow_typ` varchar(5) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '生长阶段',
-  `c_scale` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '赔偿比例',
-  `c_is_pay` varchar(5) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '是否立即赔付；‘1’是、‘0’否',
-  `c_huge_one_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '巨灾一级编码',
-  `c_huge_two_cde` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '巨灾二级编码',
-  `c_rpt_accdnt_place_detail` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `t_modify_tm` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间戳',
-  `PT` varchar(20) NOT NULL COMMENT '分区字段'
+CREATE TABLE ods_cthx_web_clm_accdnt (
+  c_ins_acc_pk_id varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '出险信息表ID',
+  c_clm_no varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '赔案号',
+  c_insured_cde varchar(50) DEFAULT NULL COMMENT '被保人编码',
+  c_insured_nme varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '被保人名称',
+  c_sex varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '性别',
+  n_age decimal(3,0) DEFAULT NULL COMMENT '年龄',
+  c_cert_typ varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证件类型',
+  c_cert_no varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证件号码',
+  c_occup_cde varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '职业',
+  t_accdnt_tm datetime NOT NULL COMMENT '出险时间',
+  c_accdnt_typ varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '险因类型',
+  c_accdnt_rsn varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '出险原因',
+  c_accdnt_rsnname varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '查勘出险原因名称',
+  c_accdnt_place varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '出险地点',
+  c_accdnt_proc text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '出险经过',
+  n_rpt_amt decimal(20,2) DEFAULT NULL COMMENT '报损金额',
+  c_rpt_cur varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报损金额币种',
+  c_remark text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '备注',
+  t_rpt_accdnt_tm datetime NOT NULL COMMENT '报案出险时间',
+  c_rpt_accdnt_typ varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报案时录入的险因类型',
+  c_rpt_accdnt_rsnname varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报案出险原因名称',
+  c_rpt_accdnt_rsn varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '报案出险原因',
+  c_rpt_accdnt_place varchar(200) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '报案出险地点',
+  c_rpt_accdnt_proc text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '报案时录入的出险经过',
+  c_crt_cde varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '创建人员',
+  t_crt_tm datetime NOT NULL COMMENT '创建时间',
+  c_upd_cde varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '修改人员',
+  t_upd_tm datetime NOT NULL COMMENT '修改时间',
+  c_trans_mrk varchar(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '迁移标志',
+  t_trans_tm datetime DEFAULT NULL COMMENT '迁移时间',
+  n_disaster_rpt_amt decimal(20,2) DEFAULT NULL COMMENT '成灾估损金额',
+  n_nogain_rpt_amt decimal(20,2) DEFAULT NULL COMMENT '绝产估损金额',
+  c_rpt_accdnt_with_rsn varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '报案伴随原因',
+  n_yl1 varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '承保农户数',
+  n_yl2 varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '受益农户数',
+  n_yl3 varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '死亡赔偿金额',
+  n_yl4 bigint(22) DEFAULT NULL COMMENT '预计赔付金额',
+  n_yl5 bigint(22) DEFAULT NULL COMMENT '承保数量',
+  n_yl6 bigint(22) DEFAULT NULL COMMENT '赔付死亡数量',
+  n_yl7 bigint(22) DEFAULT NULL COMMENT '赔付扑杀数量',
+  n_yl8 bigint(22) DEFAULT NULL COMMENT '总扑杀数量',
+  t_dead datetime DEFAULT NULL COMMENT '死亡时间',
+  n_dead_num bigint(22) DEFAULT NULL COMMENT '总死亡数',
+  n_calam_area1 bigint(22) DEFAULT NULL COMMENT '受灾面积',
+  n_calam_area2 bigint(22) DEFAULT NULL COMMENT '成灾面积',
+  n_nogain_area3 bigint(22) DEFAULT NULL COMMENT '其中绝产面积',
+  c_is_injury varchar(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '是否人伤',
+  n_psn_num decimal(4,0) DEFAULT NULL COMMENT '人数',
+  c_hospital varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '医院',
+  c_cost_proc text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '施救过程',
+  c_instant_delay varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '即时、延时报案标识',
+  c_huge_cde varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '巨灾编码',
+  c_huge_mrk varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '0否、1是',
+  c_yl1 varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '保单身份',
+  t_date_birth datetime DEFAULT NULL COMMENT '出生日期',
+  c_province varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '省份',
+  c_city varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '城市',
+  c_county varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '县',
+  c_injury_reason_code varchar(7) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '损伤外部原因代码',
+  c_grow_typ varchar(5) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '生长阶段',
+  c_scale varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '赔偿比例',
+  c_is_pay varchar(5) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '是否立即赔付；‘1’是、‘0’否',
+  c_huge_one_cde varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '巨灾一级编码',
+  c_huge_two_cde varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '巨灾二级编码',
+  c_rpt_accdnt_place_detail varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  t_modify_tm timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间戳',
+  PT varchar(20) NOT NULL COMMENT '分区字段'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 /*!50500 PARTITION BY RANGE  COLUMNS(PT)
 (PARTITION pt20170606000000 VALUES LESS THAN ('20170606999999') ENGINE = InnoDB,
  PARTITION pt20191024000000 VALUES LESS THAN ('20191024999999') ENGINE = InnoDB) */;
+
+alter table     tpedw.rpt_fxq_tb_amltp_entity modify column c_cst_no varchar(50);
+alter table     tpedw.edw_cust_pers_info modify column c_cst_no varchar(50);   
+alter table     tpedw.edw_cust_ply_party modify column c_cst_no varchar(50);
+alter table     tpedw.edw_cust_units_info modify column c_cst_no varchar(50);
+alter table     tpedw.ply_party_info_tmp modify column c_cst_no varchar(50);
+alter table     tpedw.rpt_fxq_tb_amltp_risk modify column c_cst_no varchar(50);
+alter table     tpedw.x_edw_cust_pers_units_info modify column c_cst_no varchar(50);
+
+alter table edw_cust_ply_party add column t_app_tm datetime comment '投保日期 applying time';
+alter table edw_cust_ply_party add column t_next_edr_udr_tm datetime comment  '下次批改核保日期 underwriting time of endorsement in succession';

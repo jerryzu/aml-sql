@@ -135,8 +135,8 @@ from x_rpt_fxq_tb_ins_rpol_gpol m -- 8472
 	inner join ods_cthx_web_clmnv_endcase partition(pt20191013000000) u on cm.c_clm_no = u.c_clm_no -- 结案 694
 	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on cm.c_clm_no=g.c_clm_no -- 领款人 1480    
 	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where m.t_next_edr_udr_tm > now() 
-	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
+where 1 = 1 -- and m.t_next_edr_udr_tm > now() 
+	and g.t_pay_tm between {beginday} and {endday} -- 支付时间
 	
 -- 1.一份赔案涉及多个受益人或实际收款人的，相应生成多条记录。  
 -- 2.理赔日期为实际资金交易日期。

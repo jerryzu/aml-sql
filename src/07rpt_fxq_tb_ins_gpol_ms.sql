@@ -156,5 +156,5 @@ from  x_rpt_fxq_tb_ins_rpol_gpol m
 		group by pi.c_ply_no
 		) v on m.c_ply_no = v.c_ply_no -- error
     inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where m.t_next_edr_udr_tm > now() 
-	-- and m.t_next_edr_udr_tm between {lastday} and {lastday}
+where m.t_next_edr_udr_tm >  {endday}
+	and m.t_app_tm between {beginday} and {endday} 

@@ -88,5 +88,8 @@ SELECT
     null		sys_name,
     '20191013000000' pt
 FROM edw_cust_pers_info partition(pt20191013000000) p
+    inner join edw_cust_ply_party partition(pt20191013000000) pp on p.c_cst_no = pp.c_cst_no
     left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = p.c_dpt_cde
+where pp.t_next_edr_udr_tm > {endday} 
+	and pp.t_app_tm between {beginday} and {endday}     
 -- 受益人（受益人适用人身保险业务，财产保险业务无需提取）

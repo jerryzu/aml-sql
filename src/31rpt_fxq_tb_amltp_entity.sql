@@ -20,6 +20,21 @@ concat('1', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) c_cst_no
 concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) c_cst_no
 concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')) c_cst_no
 concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')) c_cst_no -- 客户号
+
+-- 100111		100111 11 -- 税务登记证
+-- 100112		100112 13 -- 统一社会信用代码
+-- 110001		110001 12 -- 组织机构代码
+-- 110002		110002 13 -- 工商注册号码
+-- 110003		110003 14 -- 营业执照
+-- 110009		
+-- 120001		120001 11 -- 居民身份证
+-- 120002		120002 13 -- 护照
+-- 120003		120003 12 -- 军人证
+-- 120004		120004 13 -- 回乡证
+-- 120005		120005 14 -- 港澳居民居住证
+-- 120006		120006 14 -- 台湾居民居住证
+-- 120009		120009 18 -- 其它
+
 */
 alter table rpt_fxq_tb_amltp_entity truncate partition pt20191013000000;
 
@@ -32,13 +47,27 @@ insert into rpt_fxq_tb_amltp_entity(
 	,pt
 )
 select 
-    c_cst_no
+    case c_clnt_mrk 
+	when 1 then  -- 客户分类,0 法人，1 个人
+               concat('1', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
+	when 0 then   -- 客户分类,0 法人，1 个人
+               concat('2', c_cst_no, mod(substr(c_cst_no, -7, 6), 9)) 
+        end c_cst_no
+
+
     ,c_clnt_nme 
     ,c_certf_type c_cert_type
     ,c_certf_cde c_cert_cde
     ,c_clnt_cde
     ,'20191013000000' pt	--	分区字段
 from (select
+        case left(c_certf_type,2) 
+            when 10 then 0 
+            when 11 then 0 
+            when 12 then 1 
+        else 
+            1 
+        end c_clnt_mrk, -- 客户分类,0 法人，1 个人
         concat(rpad(c_certf_type, 6, '0') , rpad(c_certf_cde, 18, '0')) c_cst_no,
         c_clnt_nme,
         c_certf_type,

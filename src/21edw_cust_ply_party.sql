@@ -13,6 +13,8 @@ INSERT INTO ply_party_tmp(
     c_ins_app_rel, -- 被保险人与投保人之间的关系
     t_bgn_tm,
     t_end_tm,
+    t_app_tm, -- 投保日期
+    t_next_edr_udr_tm, -- 下次批改核保日期 
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
     c_per_biztype
 )
@@ -26,6 +28,8 @@ select  distinct
 	,c_ins_app_rel -- 被保险人与投保人之间的关系
     ,t_bgn_tm 
     ,t_end_tm  
+    ,t_app_tm -- 投保日期
+    ,t_next_edr_udr_tm -- 下次批改核保日期 
     ,c_clnt_mrk
     ,c_per_biztype
 from (	
@@ -36,6 +40,8 @@ from (
                 ,b.c_app_no
                 ,date_format(b.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
                 ,date_format(greatest(b.t_insrnc_bgn_tm,b.t_udr_tm,coalesce(b.t_edr_bgn_tm,b.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
+                ,b.t_app_tm -- 投保日期
+                ,b.t_next_edr_udr_tm -- 下次批改核保日期 
                 ,a.c_clnt_mrk
 				,c_app_ins_rel -- 投保人与被保人之间的关系
 				,c_bnfc_ins_rel -- 受益人与被保险人之间的关系
@@ -85,6 +91,8 @@ INSERT INTO ply_party_tmp2(
     c_ins_app_rel, -- 被保险人与投保人之间的关系
     t_bgn_tm,
     t_end_tm,
+    b.t_app_tm, -- 投保日期
+    b.t_next_edr_udr_tm, -- 下次批改核保日期 
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
     c_per_biztype
 )
@@ -98,6 +106,8 @@ select
     l.c_ins_app_rel, -- 被保险人与投保人之间的关系
     l.t_bgn_tm,
     l.t_end_tm,
+    l.t_app_tm, -- 投保日期
+    l.t_next_edr_udr_tm, -- 下次批改核保日期 
     l.c_clnt_mrk,   -- 客户分类,0 法人，1 个人
     l.c_per_biztype
 from ply_party_tmp l
@@ -116,6 +126,8 @@ insert into edw_cust_ply_party(
     ,c_cert_cde	--  身份证件号码
     ,t_bgn_tm	--  保险起期
     ,t_end_tm	--  保险止期
+    ,t_app_tm -- 投保日期
+    ,t_next_edr_udr_tm -- 下次批改核保日期 
     ,c_clnt_mrk	--  客户类型
     ,c_per_biztype	--  客户角色
     ,pt	--  分区字段
@@ -133,6 +145,8 @@ SELECT distinct
     p1.c_cert_cde,	--  身份证件号码
     m.t_bgn_tm,	--  保险起期
     m.t_end_tm,	--  保险止期
+    m.t_app_tm, -- 投保日期
+    m.t_next_edr_udr_tm, -- 下次批改核保日期 
     m.c_clnt_mrk,	--  客户类型
     m.c_per_biztype,	--  客户角色
     '20191013000000'	--  分区字段

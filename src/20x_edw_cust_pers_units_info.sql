@@ -268,9 +268,9 @@ select
                concat('2', concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), mod(substr(concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), -7, 6), 9)) 
         end c_cst_no
 
-		,null c_app_ins_rel -- 投保人与被保人之间的关系[ods_cthx_web_ply_applicant.c_rel_cde]',
-		,c_rel_cde c_bnfc_ins_rel -- 受益人与被保险人之间的关系[ods_cthx_web_ply_bnfc.c_rel_cde ]',
-		,null c_ins_app_rel -- 被保险人与投保人之间的关系[web_app_insured.c_app_relation]',	
+        ,null c_app_ins_rel -- 投保人与被保人之间的关系[ods_cthx_web_ply_applicant.c_rel_cde]',
+        ,c_rel_cde c_bnfc_ins_rel -- 受益人与被保险人之间的关系[ods_cthx_web_ply_bnfc.c_rel_cde ]',
+        ,null c_ins_app_rel -- 被保险人与投保人之间的关系[web_app_insured.c_app_relation]',	
 
         ,c_clnt_mrk -- 客户分类,0 法人，1 个人
         ,c_bnfc_nme c_acc_name -- 受益人名称

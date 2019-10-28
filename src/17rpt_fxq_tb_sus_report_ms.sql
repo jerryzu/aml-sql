@@ -173,9 +173,9 @@ select distinct
     ,(select count(*) from ods_amltp_t_sus_customer t  where t.su_data_id = sc2.su_data_id)  as setn  --  	可疑主体总数
     ,'20191013000000' pt	--	分区字段	
 from ods_amltp_t_is_bnif  partition(pt20191013000000)  bf
-    left join 	ods_amltp_t_is_iabi	 partition(pt20191013000000)  ii on bf.ibid = ii.ibid    
-    left join 	ods_amltp_t_sus_contract  partition(pt20191013000000)  sc on 	ii.icid = sc.policy_id
-    left join 	ods_amltp_t_sus_customer  partition(pt20191013000000)  sc2 on 	sc.su_data_id = sc2.su_data_id
-    left join 	ods_amltp_t_sus_data  partition(pt20191013000000)  sd on 	sc.su_data_id = sd.su_data_id
-    left join 	ods_amltp_t_sus_trans  partition(pt20191013000000)  st on 	sc.su_data_id = st.su_data_id
+    left join ods_amltp_t_is_iabi	 partition(pt20191013000000)  ii on bf.ibid = ii.ibid    
+    left join ods_amltp_t_sus_contract  partition(pt20191013000000)  sc on 	ii.icid = sc.policy_id
+    left join ods_amltp_t_sus_customer  partition(pt20191013000000)  sc2 on 	sc.su_data_id = sc2.su_data_id
+    left join ods_amltp_t_sus_data  partition(pt20191013000000)  sd on 	sc.su_data_id = sd.su_data_id
+    left join ods_amltp_t_sus_trans  partition(pt20191013000000)  st on 	sc.su_data_id = st.su_data_id
     left join ods_cthx_web_prd_prod  partition(pt20191013000000)  pd on sc.product_id = pd.c_prod_no;

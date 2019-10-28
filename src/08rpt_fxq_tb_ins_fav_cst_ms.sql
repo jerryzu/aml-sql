@@ -115,5 +115,5 @@ from x_rpt_fxq_tb_ins_rpol_gpol m
 	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype in (21, 22) -- error
 	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_per_biztype in (41, 42, 43) -- error
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where m.t_next_edr_udr_tm > now() and a.c_clnt_mrk = 1
-	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
+where m.t_next_edr_udr_tm > {endday} and a.c_clnt_mrk = 1
+	and m.t_app_tm between {beginday} and {endday} 
