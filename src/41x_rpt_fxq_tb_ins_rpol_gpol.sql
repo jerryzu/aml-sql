@@ -1,3 +1,21 @@
+-- *********************************************************************************
+--  文件名称: 41x_rpt_fxq_tb_ins_rpol_gpol.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: ods_cthx_web_fin_prm_due关联ods_cthx_web_fin_cav_mny生成交费信息
+--  关联保单表(ods_cthx_web_ply_base)生成含交费信息的保单信息表(含原保单、批改单级)
+--   表提取数据
+--            导入到 (x_rpt_fxq_tb_ins_rpol_gpol) 表
+--  创建者: 
+--  输入: 
+--  ods_cthx_web_fin_prm_due
+--  ods_cthx_web_fin_cav_mny
+--  ods_cthx_web_ply_base
+--  输出:  x_rpt_fxq_tb_ins_rpol_gpol
+--  创建日期: 2017/6/7
+--  修改日志: 
+--  修改日期: 
+--  修改人: 
+--  修改内容：
 
 truncate table  x_rpt_fxq_tb_ins_rpol_gpol;
 

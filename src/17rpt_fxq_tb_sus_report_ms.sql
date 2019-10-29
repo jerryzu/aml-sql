@@ -1,12 +1,19 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
+--  文件名称: 17rpt_fxq_tb_sus_report_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
 --  功能描述: 从 
 --   表提取数据
---            导入到 () 表
+--            导入到 (rpt_fxq_tb_sus_report_ms) 表
 --  创建者: 
 --  输入: 
---  输出:  
+--  ods_amltp_t_is_bnif
+--  ods_amltp_t_is_iabi
+--  ods_amltp_t_sus_contract
+--  ods_amltp_t_sus_customer
+--  ods_amltp_t_sus_data
+--  ods_amltp_t_sus_trans
+--  ods_cthx_web_prd_prod
+--  输出:  rpt_fxq_tb_sus_report_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 

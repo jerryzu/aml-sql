@@ -1,12 +1,20 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 08rpt_fxq_tb_ins_fav_cst_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 获取非自然人保单(投保人)的被保人与受益人信息列表
+--   保单中间表(x_rpt_fxq_tb_ins_rpol_gpol),以保单相关方关系表(edw_cust_ply_party)过滤获取非自然人保单
+--   对形成结果非自然人保单,关联保单相关方关系表(edw_cust_ply_party)获取相关方被保人信息,得保单被保人列表
+--   对形成结果非自然人保单,关联保单相关方关系表(edw_cust_ply_party)获取相关方受益人信息,得保单受益人列表
+--  合并保单被保人列表,保单受益人列表形成单位客户保单对应的被保险人及受益人信息表
 --   表提取数据
---            导入到 () 表
+--            导入到 (rpt_fxq_tb_ins_fav_cst_ms) 表
 --  创建者: 
 --  输入: 
+--  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(获取非自然人保单)
+--  edw_cust_ply_party -- 用于过滤非自然人 c_per_biztype:22; 获取被保险人c_per_biztype: 31,32,33, 受益人c_per_biztype: 41,42,43
+--  rpt_fxq_tb_company_ms
 --  输出:  
+--  rpt_fxq_tb_ins_fav_cst_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 
@@ -79,11 +87,11 @@ select
     '20191013000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype in (21, 22)  
+	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  22
 	inner join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no and i.c_per_biztype in (31, 32, 33)
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where m.t_next_edr_udr_tm > now() and a.c_clnt_mrk = 1
-	-- and m.t_edr_bgn_tm between {lastday} and {lastday}
+where m.t_next_edr_udr_tm > {endday} and a.c_clnt_mrk = 0
+	and m.t_app_tm between {beginday} and {endday} 
 union all
 /* 受益人部分提取*/
 select
@@ -113,8 +121,8 @@ select
 	'20191013000000' pt	
 from x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype in (21, 22) -- error
-	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_per_biztype in (41, 42, 43) -- error
+	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  22 
+	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_per_biztype in (41, 42, 43) 
 	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where m.t_next_edr_udr_tm > {endday} and a.c_clnt_mrk = 1
+where m.t_next_edr_udr_tm > {endday} and a.c_clnt_mrk = 0
 	and m.t_app_tm between {beginday} and {endday} 

@@ -1,12 +1,19 @@
 -- *********************************************************************************
 --  文件名称: 02rpt_fxq_tb_ins_rtype_ms.sql
---  所属主题: 理赔
---  功能描述: 从 
---   表提取数据
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述:  
+--   保险险种代码对照表
+--  由机构部门表(web_org_dpt),通过机构映射表(ods_cthx_web_org_dpt_map)关联产品表产品大类表生成保险险种代码对照表
 --            导入到 (rpt_fxq_tb_ins_rtype_ms) 表
 --  创建者: 
 --  输入: 
---  输出:  rpt_fxq_tb_ins_rtype_ms
+--  ods_cthx_web_org_dpt
+--  ods_cthx_web_org_dpt_map
+--  ods_cthx_web_prd_prod
+--  ods_cthx_web_prd_kindk
+--  rpt_fxq_tb_company_ms
+--  输出:  
+--  rpt_fxq_tb_ins_rtype_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 

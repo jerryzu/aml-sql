@@ -1,3 +1,25 @@
+-- *********************************************************************************
+--  文件名称: 20x_edw_cust_pers_units_info.sql
+--  所属主题: 保单-客户主题
+--  功能描述: 将投保人(ods_cthx_web_ply_applicant)、被保人(ods_cthx_web_app_insured)、受益人(ods_cthx_web_ply_bnfc)
+--  、团单被保人受益人(ods_cthx_web_app_grp_member)、收款人(ods_cthx_web_clm_bank)，格式对整后导入保单客户信息表
+--   表提取数据
+--            导入到 (x_edw_cust_pers_units_info) 表
+--  创建者: 
+--  输入: 
+--  ods_cthx_web_ply_applicant
+--  ods_cthx_web_app_insured
+--  ods_cthx_web_ply_bnfc
+--  ods_cthx_web_app_grp_member --同时取团单的被保人，受益人
+--  ods_cthx_web_clm_bank
+--  ods_cthx_web_clm_main --用于收款人取保单号，申请单号
+--  输出:  x_edw_cust_pers_units_info
+--  创建日期: 2017/6/7
+--  修改日志: 
+--  修改日期: 
+--  修改人: 
+--  修改内容：
+
 truncate table x_edw_cust_pers_units_info;
 
 /*

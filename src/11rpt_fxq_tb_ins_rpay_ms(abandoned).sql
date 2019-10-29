@@ -1,7 +1,7 @@
 -- *********************************eee************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 11rpt_fxq_tb_ins_rpay_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 弃用(表适用人身保险业务,太科都是财产险不需上报)
 --   表提取数据
 --            导入到 () 表
 --  创建者: 
@@ -17,7 +17,7 @@
 --   2.本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。
 
 alter table rpt_fxq_tb_ins_rpay_ms truncate partition pt20191013000000;
-
+/*
 INSERT INTO rpt_fxq_tb_ins_rpay_ms(
         company_code1,
         company_code2,
@@ -97,9 +97,10 @@ select
 from x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 	left join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no  and a.c_per_biztype in (21, 22)
-	/* left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no  -- error */
-	/* left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no -- error */
+	left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no
+	left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no
 	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
 where 1 = 1 and m.t_next_edr_udr_tm > {endday} 
 	and m.t_app_tm between {beginday} and {endday} 
+*/
 --   本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。

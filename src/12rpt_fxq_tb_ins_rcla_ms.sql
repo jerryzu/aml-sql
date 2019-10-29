@@ -1,18 +1,32 @@
 -- *******************eeeerrrrr**************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 12rpt_fxq_tb_ins_rcla_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 
+--  从保单中间表(x_rpt_fxq_tb_ins_rpol_gpol),三次关联保单相关方表(edw_cust_ply_party),获取投保人、被保人、受益人信息
+--  关联理赔主表(ods_cthx_web_clm_main)，获取理赔赔案号
+--    关联理赔申请人(ods_cthx_web_clm_rpt)获取理赔申请人信息
+--    关联出险表(ods_cthx_web_clm_accdnt)获取理赔被保险人信息(关联结案表时过滤)
+--    关联结案(理赔信息ods_cthx_web_clmnv_endcase)获取结案被保险人信息
+--    	关联实际领款人(ods_cthx_web_clm_bank)获取实际领款人信息
 --   表提取数据
---            导入到 () 表
+--            导入到 (rpt_fxq_tb_ins_rcla_ms) 表
 --  创建者: 
---  输入: 
---  输出:  
+--  输入:  
+--  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
+--  edw_cust_ply_party -- 保单相关方表
+--  ods_cthx_web_clm_main  -- 理赔主表(中间表,用于获取赔案信息))
+--  ods_cthx_web_clm_rpt  -- 理赔申请人（理赔号唯一) 
+--  ods_cthx_web_clm_accdnt  -- 出险表(用于取出被保险人信息,关联结案表确定被保人,但由于关联关系暂末确定)
+--  ods_cthx_web_clmnv_endcase  -- 结案
+--  ods_cthx_web_clm_bank -- 领款人
+--  输出:
+--    rpt_fxq_tb_ins_rcla_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 
 --  修改人: 
 --  修改内容：
--- 说明：
+--  说明：
 --   1.本表数据范围为检查业务期限内，检查对象所有理赔信息，每一笔理赔支付业务生成一条完整的记录，一份赔案涉及多个受益人或实际收款人的，相应生成多条记录。  
 --   2.理赔日期为实际资金交易日期。
 
@@ -138,25 +152,3 @@ from x_rpt_fxq_tb_ins_rpol_gpol m -- 8472
 	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where 1 = 1 -- and m.t_next_edr_udr_tm > now() 
 	and g.t_pay_tm between {beginday} and {endday} -- 支付时间
-	
--- 1.一份赔案涉及多个受益人或实际收款人的，相应生成多条记录。  
--- 2.理赔日期为实际资金交易日期。
--- 检查业务期限内，检查对象所有给付信息，每一笔业务生成一条完整的记录
-
-/*
-drop table  if exists accdnt;
-create temporary table accdnt
-select 
-        c_clm_no 
-        ,m.c_insured_cde -- 被保人编码
-        ,i.c_insured_cde c_insured_cde_o-- 被保人编码
-        ,m.c_insured_nme -- 被保人名称
-        ,i.c_insured_nme c_insured_nme_o-- 被保人名称
-        ,c_cert_typ -- 证件类型
-        ,i.c_certf_cls c_cert_typ_o-- 证件类型 
-        ,c_cert_no  -- 证件号码
-        ,i.c_certf_cde c_cert_no_o -- 证件号码
-from ods_cthx_web_clm_accdnt partition (pt20191013000000) m
-        left join ods_cthx_web_ply_insured  partition (pt20191013000000) i --因为一个c_insured_cde在insured中有多条，所以取消连接
-                on m.c_insured_cde = i.c_insured_cde                
-*/

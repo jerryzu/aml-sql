@@ -1,12 +1,18 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 13rpt_fxq_tb_ins_rchg_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 从保单中间表(x_rpt_fxq_tb_ins_rpol_gpol),通过保单相关方(edw_cust_ply_party)获取投保人信息
+--   通过保单批改原因表(ods_cthx_web_bas_edr_rsn)过滤批改原因为'22','-J1','-Z1'(所有非支付类保全/批改业务),的批改记录,获取最终检查期所有非支付类保全/批改业务清单
 --   表提取数据
---            导入到 () 表
+--            导入到 (rpt_fxq_tb_ins_rchg_ms) 表
 --  创建者: 
 --  输入: 
---  输出:  
+--  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
+--  edw_cust_ply_party  --保单相关方表
+--  ods_cthx_web_bas_edr_rsn -- 保单批改原因表
+--  rpt_fxq_tb_company_ms
+--  输出:
+--    rpt_fxq_tb_ins_rchg_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 
@@ -60,5 +66,3 @@ from x_rpt_fxq_tb_ins_rpol_gpol m
 where e.c_rsn_cde in ('22','-J1','-Z1') -- and m.t_next_edr_udr_tm > now()  
     and m.n_prm_var <> 0 --  测试此条件没有满足记录
 	and m.t_app_tm between {beginday} and {endday} 
-
--- 本表提取除退保、加保、减保、理赔、给付、保单质押借款等以外的所有非支付类保全/批改业务，每一次保全业务生产一条记录。    

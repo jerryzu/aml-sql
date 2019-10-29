@@ -1,12 +1,22 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
---   表提取数据
---            导入到 () 表
+--  文件名称: 07rpt_fxq_tb_ins_gpol_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 本功能为获取非自然人保单,通过提取得到保单信息,被保人个数,保单标的信息
+--  处理逻辑
+--  由保单中间表(x_rpt_fxq_tb_ins_rpol_gpol),通过保单相关方信息表(edw_cust_ply_party)过滤非自然人保单
+--  通过保单相关方信息表(edw_cust_ply_party)获取被保人个数
+--  通过保单标的信息表(ods_cthx_web_ply_ent_tgt)获取保单标的信息
+--  通过产品表获取险种信息,关联后形成检查期所有单位承保及特定业务保单--   表提取数据
+--            导入到 (rpt_fxq_tb_ins_gpol_ms) 表
 --  创建者: 
 --  输入: 
+--  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
+--  edw_cust_ply_party  -- 保单相关方信息表,用于获取非自然人保单关联信息,被保人个数
+--  ods_cthx_web_ply_ent_tgt -- 保单标的表
+--  ods_cthx_web_prd_prod
+--  edw_cust_ply_partyrpt_fxq_tb_company_ms
 --  输出:  
+--  rpt_fxq_tb_ins_gpol_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 

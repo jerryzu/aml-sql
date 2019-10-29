@@ -1,12 +1,18 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 10rpt_fxq_tb_ins_rsur_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 从保单中间表(x_rpt_fxq_tb_ins_rpol_gpol),通过保单相关方(edw_cust_ply_party)获取投保人信息,通过保单批改原因表(ods_cthx_web_bas_edr_rsn)过滤批改原因为'08','s1','s2'(退费类业务),的批改记录,获取最终检查期所有退费类保单
 --   表提取数据
---            导入到 () 表
+--            导入到 (rpt_fxq_tb_ins_rsur_ms) 表
 --  创建者: 
 --  输入: 
---  输出:  
+--  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
+--  edw_cust_ply_party  --保单相关方表
+--  ods_cthx_web_bas_edr_rsn -- 保单批改原因表
+--  ods_cthx_web_prd_prod -- 产品表
+--  rpt_fxq_tb_company_ms
+--  输出:
+--    rpt_fxq_tb_ins_rsur_ms
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 

@@ -1,44 +1,28 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 06s_rpt_fxq_tb_ins_rpol_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 实现保单被保人与受益人关系信息表
+--  处理逻辑
+--  对于团单,直接通过团单成员信息表(ods_cthx_web_app_grp_member),获取团单被保人与受益人信息
+--  对于个单,通过保单中间表(x_rpt_fxq_tb_ins_rpol_gpol),以保单相关方关系表(edw_cust_ply_party)过滤获取自然人保单
+--  二次关联保单客户信息(x_edw_cust_pers_units_info),获取保单被保人,保单受益人关系
+--  通过合并客户自然人表(edw_cust_pers_info),客户非自然人表(edw_cust_units_info)形成唯一客户信息
+--  对已获取的保单关系表(保单,被保人,受益人),关联合并后的客户信息生成最终包括保单,保单被保人,保单受益人信息
 --   表提取数据
---            导入到 () 表
+--            导入到 (s_rpt_fxq_tb_ins_rpol_ms) 表
 --  创建者: 
 --  输入: 
+--  ods_cthx_web_app_grp_member -- 团单成员信息表
+--  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
+--  x_edw_cust_pers_units_info --保单分类客户信息(投保人信息,被保人信息,受益人信息,每个一条记录))
+--  edw_cust_pers_info -- 身份证编号唯一自然人客户信息表
+--  edw_cust_units_info -- 法人编号唯一非自然人客户信息表
 --  输出:  
 --  创建日期: 2017/6/7
 --  修改日志: 
 --  修改日期: 
 --  修改人: 
 --  修改内容：
-
-/*
-DROP TABLE s_rpt_fxq_tb_ins_rpol_ms;
-CREATE TABLE s_rpt_fxq_tb_ins_rpol_ms
-    (
-        c_dpt_cde VARCHAR(20) COMMENT '机构网点代码',
-        c_ply_no VARCHAR(50) COMMENT '保单编号',
-        c_app_no VARCHAR(50) COMMENT '申请单号，批改申请单号',
-        c_ins_no VARCHAR(32) COMMENT '被保人客户编号',
-        c_ins_clnt_mrk varchar(1) COMMENT '被保人客户分类,0 法人，1 个人',
-        c_ins_name VARCHAR(40) COMMENT '被保人名称',
-        c_ins_cert_cls VARCHAR(8) COMMENT '被保人身份证件种类',
-        c_ins_cert_cde VARCHAR(50) COMMENT '被保人身份证件号码',
-        c_bnfc_no VARCHAR(32) COMMENT '受益人客户编号',
-        c_bnfc_clnt_mrk varchar(1) COMMENT '受益人客户分类,0 法人，1 个人',
-        c_bnfc_name VARCHAR(40) COMMENT '受益人名称',
-        c_bnfc_cert_cls VARCHAR(8) COMMENT '受益人身份证件种类',
-        c_bnfc_cert_cde VARCHAR(50) COMMENT '受益人身份证件号码',
-        c_grp_mrk varchar(1)  COMMENT '团单标志( 0 个单; 1 团单) Group Insurance Flag',
-        c_app_relation VARCHAR(30) COMMENT '与被保人关系',
-        pt VARCHAR(15) COMMENT '分区字段',
-        INDEX edw_cust_ply_party_insured_pk (c_ply_no, pt),
-        INDEX edw_cust_ply_party_insured_pk1 (c_app_no, pt)
-    )
-    ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='保单相关方关系表';
-*/
-
 
 truncate table s_rpt_fxq_tb_ins_rpol_ms;
 
@@ -119,9 +103,10 @@ from (
                 ,m.c_app_no
                 ,date_format(m.t_insrnc_bgn_tm, '%Y%m%d') t_bgn_tm
                 ,date_format(greatest(m.t_insrnc_bgn_tm,m.t_udr_tm,coalesce(m.t_edr_bgn_tm,m.t_insrnc_bgn_tm)), '%Y%m%d') t_end_tm
-                ,1 c_clnt_mrk  --  采集结果显示团单受益人只有自然人,另一个原因没有ods_cthx_web_app_grp_member.c_clnt_mrk
+                ,1 c_clnt_mrk  
         from x_rpt_fxq_tb_ins_rpol_gpol m  
                 --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
+				inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  21 
                 inner join x_edw_cust_pers_units_info  i on m.c_app_no = i.c_app_no and i.c_per_biztype in (31, 32)  
                 -- inner join x_edw_cust_pers_units_info  b on m.c_app_no = b.c_app_no and b.c_per_biztype in (41, 42)  
         where i.c_cert_cls is not null and trim(i.c_cert_cls)  <> '' and i.c_cert_cls REGEXP '[^0-9.]' = 0 and i.c_cert_cde is not null and trim(i.c_cert_cde)  <> '' 

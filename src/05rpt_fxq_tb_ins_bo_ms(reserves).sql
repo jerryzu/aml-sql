@@ -1,7 +1,7 @@
 -- *********************************************************************************
---  文件名称: .sql
---  所属主题: 理赔
---  功能描述: 从 
+--  文件名称: 05rpt_fxq_tb_ins_bo_ms.sql
+--  所属主题: 中国人民银行反洗钱执法检查数据提取接口
+--  功能描述: 没有可用有效数据源,暂停使用
 --   表提取数据
 --            导入到 () 表
 --  创建者: 
@@ -17,20 +17,6 @@
 --    2.每个受益所有人增加一条记录。
 alter table rpt_fxq_tb_ins_bo_ms truncate partition pt20191013000000;
 
-/*
-目前非自然人的受益所有人在业务系统中没有实现
-drop table  if exists unitply;
-create temporary table unitply
-select c_ply_no, c_app_no
-from edw_cust_ply_party
-where c_clnt_mrk = 0   -- 客户分类,0 法人，1 个人
-        and c_biz_type in ('21','31','33','41','43') --  保单人员参于类型:投保人:21,    被保人:31,    受益人:41,    团单被保人:33,    团单受益人:43,    收款人:11
-group by c_ply_no, c_app_no
-
-select *
-from x_rpt_fxq_tb_ins_rpol_gpol m
-        inner join unitply up on m.c_app_no = up.c_app_no
-*/
 INSERT INTO rpt_fxq_tb_ins_bo_ms(
         company_code1,
         company_code2,
@@ -84,6 +70,4 @@ where a1.c_biz_type = 22 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 3
    and a1.c_clnt_mrk='0' -- 受益人没有客户类别区分,申请人有客户类别区分
    and a2.c_biz_type = 43 -- 10: 收款人, 21: 投保人, 22: 法人投保人, 31:被保人, 32:法人被保人, 33: 团单被保人，41: 受益人, 42: 法人受益人, 43: 团单受益人
    and a2.c_clnt_mrk='1'
-
 	-- and m.t_app_tm between {beginday} and {endday} 
-/*这里只有投保人，还有被保人，受益人为非自然人时的，受益所有人信息*/
