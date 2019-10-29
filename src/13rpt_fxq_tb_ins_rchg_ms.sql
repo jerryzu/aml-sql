@@ -52,7 +52,8 @@ select
     end as item, -- 保全/批改项目	11:变更投保人;12:团险替换被保险人;13:变更受益人;14:变更客户(投保人被保人)信息;15:保单转移;
 	m.c_edr_ctnt as con_bef,-- 变更内容摘要
     '20191013000000' pt
-from x_rpt_fxq_tb_ins_rpol_gpol m
+from x_rpt_fxq_tb_ins_rpol_gpol m    
+	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_ply_no = a.c_ply_no and a.c_per_biztype in (21, 22)
 	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) e on m.c_edr_rsn_bundle_cde = e.c_rsn_cde and substr(m.c_prod_no,1,2) = e.c_kind_no
     left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
