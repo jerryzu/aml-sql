@@ -59,13 +59,13 @@ select
     when '110001' then 22 -- 组织机构代码
     when '110002' then 22 -- 工商注册号码
     when '110003' then 21 -- 营业执照
-    when  '120001' then 11 -- 居民身份证
-    when  '120002' then 13 -- 护照
-    when  '120003' then 12 -- 军人证
-    when  '120004' then 13 -- 回乡证
-    when  '120005' then 14 -- 港澳居民居住证
-    when  '120006' then 14 -- 台湾居民居住证
-    when  '120009' then 18 -- 其它
+    when '120001' then 11 -- 居民身份证
+    when '120002' then 13 -- 护照
+    when '120003' then 12 -- 军人证
+    when '120004' then 13 -- 回乡证
+    when '120005' then 14 -- 港澳居民居住证
+    when '120006' then 14 -- 台湾居民居住证
+    when '120009' then 18 -- 其它
     else 22 -- 其它
     end as app_id_type,-- 投保人身份证件类型
     a.c_cert_cde as app_id_no,-- 投保人证件号码
@@ -89,16 +89,16 @@ select
     '' as renew_date,-- 业务发生日期
     '' as pay_date,-- 资金交易日期
     case m.c_prm_cur 
-    when  '01' then 'CNY' -- 人民币
-    when  '02' then 'USD' -- 美元
-    when  '03' then 'HKD' -- 港币
-    when  '04' then 'CHF' -- 瑞士法郎
-    when  '05' then 'FF' -- 法国法郎
-    when  '06' then 'JPY' -- 日元
-    when  '07' then 'GBP' -- 英镑
-    when  '08' then 'EUR' -- 欧元
-    when  '09' then 'DM' -- 德国马克
-    when  '10' then 'SEK' -- 瑞典克朗
+    when '01' then 'CNY' -- 人民币
+    when '02' then 'USD' -- 美元
+    when '03' then 'HKD' -- 港币
+    when '04' then 'CHF' -- 瑞士法郎
+    when '05' then 'FF' -- 法国法郎
+    when '06' then 'JPY' -- 日元
+    when '07' then 'GBP' -- 英镑
+    when '08' then 'EUR' -- 欧元
+    when '09' then 'DM' -- 德国马克
+    when '10' then 'SEK' -- 瑞典克朗
     else 
     '@N' -- 其它
     end as  cur_code,-- 币种
