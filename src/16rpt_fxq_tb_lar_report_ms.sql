@@ -4,14 +4,14 @@
 --  功能描述:  
 --   表提取数据
 --            导入到 (rpt_fxq_tb_lar_report_ms) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  ods_amltp_t_lat_data
 --  ods_amltp_t_lat_customer
 --  ods_amltp_t_ih_tsdt
 --  输出:
 --    rpt_fxq_tb_lar_report_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

@@ -3,13 +3,13 @@
 --  所属主题: 中国人民银行反洗钱执法检查数据提取接口
 --  功能描述: 
 --   根据机构部门表(web_org_dpt),通过手工映射表(rpt_fxq_manual_company_ms)生成最终机构对照表(rpt_fxq_tb_company_ms)
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  ods_cthx_web_org_dpt
 --  rpt_fxq_manual_company_ms
 --  输出:  
 --  rpt_fxq_tb_company_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

@@ -8,7 +8,7 @@
 --  通过保单标的信息表(ods_cthx_web_ply_ent_tgt)获取保单标的信息
 --  通过产品表获取险种信息,关联后形成检查期所有单位承保及特定业务保单--   表提取数据
 --            导入到 (rpt_fxq_tb_ins_gpol_ms) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
 --  edw_cust_ply_party  -- 保单相关方信息表,用于获取非自然人保单关联信息,被保人个数
@@ -17,7 +17,7 @@
 --  edw_cust_ply_partyrpt_fxq_tb_company_ms
 --  输出:  
 --  rpt_fxq_tb_ins_gpol_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

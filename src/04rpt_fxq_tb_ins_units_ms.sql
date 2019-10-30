@@ -4,14 +4,14 @@
 --  功能描述: 从保单客户主题,保单相关非自然人信息表(edw_cust_units_info),通过保单三方关系表(edw_cust_ply_party)获取保单有效日期等信息过滤生成反洗钱单位客户身份信息记录清单
 --   表提取数据
 --            导入到 (rpt_fxq_tb_ins_unit_ms) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  edw_cust_units_info
 --  edw_cust_ply_party
 --  rpt_fxq_tb_company_ms
 --  输出:  
 --  rpt_fxq_tb_ins_unit_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

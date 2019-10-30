@@ -4,10 +4,10 @@
 --  功能描述: 通过客户风险等级表(rpt_fxq_tb_amltp_risk),根据客户号倒排序获取客户最新风险等级
 --   表提取数据
 --            导入到 (rpt_fxq_tb_ins_risk_new_ms) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入:  rpt_fxq_tb_amltp_risk
 --  输出:  rpt_fxq_tb_ins_risk_new_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

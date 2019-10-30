@@ -5,7 +5,7 @@
 --  关联保单客户表(合并自然人，非自然人)，形成最终客户一致化的客户风险评估信息表
 --   表提取数据
 --            导入到 (rpt_fxq_tb_amltp_risk) 表
---  创建者: 
+--  创建者:祖新合
 --  输入: 
 --  rpt_fxq_tb_amltp_entity
 --  rpt_fxq_tb_amltp_score
@@ -13,7 +13,7 @@
 --    edw_cust_units_info
 --  rpt_fxq_manual_company_ms
 --  输出:  rpt_fxq_tb_amltp_risk
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

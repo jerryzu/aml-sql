@@ -5,7 +5,7 @@
 --  、团单被保人受益人(ods_cthx_web_app_grp_member)、收款人(ods_cthx_web_clm_bank)，格式对整后导入保单客户信息表
 --   表提取数据
 --            导入到 (x_edw_cust_pers_units_info) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  ods_cthx_web_ply_applicant
 --  ods_cthx_web_app_insured
@@ -14,7 +14,7 @@
 --  ods_cthx_web_clm_bank
 --  ods_cthx_web_clm_main --用于收款人取保单号，申请单号
 --  输出:  x_edw_cust_pers_units_info
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

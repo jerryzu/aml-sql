@@ -4,7 +4,7 @@
 --  功能描述: 从 
 --   表提取数据
 --            导入到 (rpt_fxq_tb_sus_report_ms) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  ods_amltp_t_is_bnif
 --  ods_amltp_t_is_iabi
@@ -14,7 +14,7 @@
 --  ods_amltp_t_sus_trans
 --  ods_cthx_web_prd_prod
 --  输出:  rpt_fxq_tb_sus_report_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

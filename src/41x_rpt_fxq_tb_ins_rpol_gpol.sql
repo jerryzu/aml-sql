@@ -5,13 +5,13 @@
 --  关联保单表(ods_cthx_web_ply_base)生成含交费信息的保单信息表(含原保单、批改单级)
 --   表提取数据
 --            导入到 (x_rpt_fxq_tb_ins_rpol_gpol) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  ods_cthx_web_fin_prm_due
 --  ods_cthx_web_fin_cav_mny
 --  ods_cthx_web_ply_base
 --  输出:  x_rpt_fxq_tb_ins_rpol_gpol
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 

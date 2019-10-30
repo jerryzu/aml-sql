@@ -8,14 +8,14 @@
 --  合并保单被保人列表,保单受益人列表形成单位客户保单对应的被保险人及受益人信息表
 --   表提取数据
 --            导入到 (rpt_fxq_tb_ins_fav_cst_ms) 表
---  创建者: 
+--  创建者:祖新合 
 --  输入: 
 --  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(获取非自然人保单)
 --  edw_cust_ply_party -- 用于过滤非自然人 c_per_biztype:22; 获取被保险人c_per_biztype: 31,32,33, 受益人c_per_biztype: 41,42,43
 --  rpt_fxq_tb_company_ms
 --  输出:  
 --  rpt_fxq_tb_ins_fav_cst_ms
---  创建日期: 2017/6/7
+--  创建日期: 2019/10/30
 --  修改日志: 
 --  修改日期: 
 --  修改人: 
