@@ -14,7 +14,7 @@
 --  输入: 
 --  ods_cthx_web_app_grp_member -- 团单成员信息表
 --  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单)
---  x_edw_cust_pers_units_info --保单分类客户信息(投保人信息,被保人信息,受益人信息,每个一条记录))
+--  x_edw_cust_pers_units_info --保单分类客户信息(投保人信息,被保人信息,受益人信息,每个一条记录)
 --  edw_cust_pers_info -- 身份证编号唯一自然人客户信息表
 --  edw_cust_units_info -- 法人编号唯一非自然人客户信息表
 --  输出:  

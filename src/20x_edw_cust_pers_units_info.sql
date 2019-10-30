@@ -276,25 +276,35 @@ insert into x_edw_cust_pers_units_info(
 select 
          c_ply_no  -- 保单号，保单号 Policy No
         ,c_app_no  -- 申请单号，批改申请单号
-        ,case c_clnt_mrk 
-		when 1 then  -- 客户分类,0 法人，1 个人
-			41 
-		when 0 then   -- 客户分类,0 法人，1 个人
-			42
-		end c_per_biztype  	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-		-- c_cst_no已经编码由身份证类型6位,身份证号码18位组成,这里校验码取倒数第7位至倒数第2位与9取MOD
-		,case c_clnt_mrk 
-		when 1 then  -- 客户分类,0 法人，1 个人
-				concat('1', concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), mod(substr(concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), -7, 6), 9)) 
-		when 0 then   -- 客户分类,0 法人，1 个人
+        ,case left(c_certf_cls,2)  
+        when 12 then  -- 客户分类,0 法人，1 个人
+                41 
+        when 10 then   -- 客户分类,0 法人，1 个人
+                42
+        when 11 then   -- 客户分类,0 法人，1 个人
+                42
+        else    
+                41
+        end c_per_biztype  	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
+        -- c_cst_no已经编码由身份证类型6位,身份证号码18位组成,这里校验码取倒数第7位至倒数第2位与9取MOD
+        ,case left(c_certf_cls,2) 
+        when 10 then   -- 客户分类,0 法人，1 个人
 				concat('2', concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), mod(substr(concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), -7, 6), 9)) 
+        when 11 then   -- 客户分类,0 法人，1 个人
+				concat('2', concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), mod(substr(concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), -7, 6), 9)) 
+        when 12 then  -- 客户分类,0 法人，1 个人
+                        concat('1', concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), mod(substr(concat(rpad(c_certf_cls, 6, '0') , rpad(c_certf_cde, 18, '0')), -7, 6), 9)) 
         end c_cst_no
-
         ,null c_app_ins_rel -- 投保人与被保人之间的关系[ods_cthx_web_ply_applicant.c_rel_cde]',
         ,c_rel_cde c_bnfc_ins_rel -- 受益人与被保险人之间的关系[ods_cthx_web_ply_bnfc.c_rel_cde ]',
-        ,null c_ins_app_rel -- 被保险人与投保人之间的关系[web_app_insured.c_app_relation]',	
-
-        ,c_clnt_mrk -- 客户分类,0 法人，1 个人
+        ,null c_ins_app_rel -- 被保险人与投保人之间的关系[web_app_insured.c_app_relation]',
+        ,case left(c_certf_cls,2) 
+            when 10 then 0 
+            when 11 then 0 
+            when 12 then 1 
+        else 
+            1 
+        end c_clnt_mrk -- 客户分类,0 法人，1 个人
         ,c_bnfc_nme c_acc_name -- 受益人名称
         ,c_certf_cls -- 证件类型
         ,c_certf_cde --  证件号码
@@ -435,6 +445,7 @@ insert into x_edw_cust_pers_units_info(
         c_ply_no	 -- 	保单号，保单号 Policy No
         ,c_app_no	 -- 	申请单号，批改申请单号
         ,c_per_biztype		--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
+        ,c_cst_no	 -- 	客户号
         ,c_app_ins_rel -- 投保人与被保人之间的关系
         ,c_bnfc_ins_rel -- 受益人与被保险人之间的关系
         ,c_ins_app_rel -- 被保险人与投保人之间的关系
