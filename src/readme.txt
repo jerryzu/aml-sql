@@ -54,3 +54,12 @@ ls cdm_fin_pay_dd.sql cdm_fin_prm_dd.sql adm_stat_financial_exp_ms.sql cdm_fin_c
 
 2.清除本地缓存帐号信息
 rm -rf ~/.subversion/auth
+
+alter table ods_cthx_web_clm_accdnt  reorganize partition pt20191024000000 into (partition pt20191013000000 values less than('20191013999999'), partition pt20191024000000 values less than('20191024999999')); 
+
+SELECT @@innodb_buffer_pool_size;
+SET GLOBAL innodb_buffer_pool_size=402653184;
+ SELECT @@innodb_io_capacity_max;
+SET GLOBAL innodb_io_capacity_max=6000;
+ SELECT @@innodb_io_capacity;
+SET GLOBAL innodb_io_capacity=2000;

@@ -22,6 +22,10 @@
 
 alter table rpt_fxq_tb_ins_unit_ms truncate partition pt20191013000000;
 
+drop table if exists party;
+
+create temporary table party select distinct c_cst_no from edw_cust_ply_party partition(pt20191013000000)   /* where t_next_edr_udr_tm > {endday} 	and t_app_tm between {beginday} and {endday}  */;
+
 INSERT INTO rpt_fxq_tb_ins_unit_ms(
     company_code1,
     company_code2,
@@ -58,10 +62,10 @@ INSERT INTO rpt_fxq_tb_ins_unit_ms(
 SELECT
     u.c_dpt_cde as company_code1, -- 机构网点代码，内部的机构编码
     co.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
-    c_cst_no	        cst_no	,
+    u.c_cst_no	        cst_no	,
     date_format(t_open_time,'%Y%m%d')	        open_time	,
     date_format(t_close_time,'%Y%m%d')	        close_time	,
-    c_acc_name	        acc_name	,
+    u.c_acc_name	        acc_name	,
     c_clnt_addr	        address	,
     c_manage_area	        operate	,        
     '21'                           set_file,-- 依法设立的执照名称，21营业执照、22其他
@@ -124,7 +128,5 @@ SELECT
     null	        sys_name	,
     '20191013000000' pt
 FROM edw_cust_units_info partition(pt20191013000000) u
-    inner join edw_cust_ply_party partition(pt20191013000000) pp on p.c_cst_no = pp.c_cst_no
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = u.c_dpt_cde
-where pp.t_next_edr_udr_tm > {endday} 
-	and pp.t_app_tm between {beginday} and {endday}
+    inner join party pp on u.c_cst_no = pp.c_cst_no
+    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = u.c_dpt_cde;

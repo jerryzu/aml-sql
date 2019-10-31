@@ -124,6 +124,8 @@ from x_rpt_fxq_tb_ins_rpol_gpol m
 	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) e on m.c_edr_rsn_bundle_cde=e.c_rsn_cde and substr(m.c_prod_no,1,2)=e.c_kind_no
 	inner join ods_cthx_web_prd_prod partition(pt20191013000000) p on m.c_prod_no=p.c_prod_no
 	left join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-where e.c_rsn_cde in ('07') and m.t_app_tm between {beginday} and {endday} 
-
+where e.c_rsn_cde in ('07') 
+	/* 
+	and m.t_app_tm between {beginday} and {endday} 
+	*/
 -- 本表数据范围为检查业务期限内，检查对象办理的所有的增加或追加保费、保额业务保单信息    

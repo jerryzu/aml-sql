@@ -19,6 +19,10 @@
 
 alter table rpt_fxq_tb_ins_pers_ms truncate partition pt20191013000000;
 
+drop table if exists party;
+
+create temporary table party select distinct c_cst_no from edw_cust_ply_party partition(pt20191013000000)   /* where t_next_edr_udr_tm > {endday} 	and t_app_tm between {beginday} and {endday}  */;
+
 INSERT INTO rpt_fxq_tb_ins_pers_ms(
         company_code1,
         company_code2,
@@ -47,10 +51,10 @@ INSERT INTO rpt_fxq_tb_ins_pers_ms(
 SELECT
 	p.c_dpt_cde as company_code1, -- 机构网点代码，内部的机构编码
     co.company_code2	company_code2,
-    c_cst_no		cst_no,
+    p.c_cst_no		cst_no,
     date_format(t_open_time,'%Y%m%d')		open_time,
     date_format(t_close_time,'%Y%m%d')		close_time,
-    c_acc_name		acc_name,
+    p.c_acc_name		acc_name,
     /* 性别 unpass*/  -- 11: 男; 12: 女。填写数字。
     case c_cst_sex
     when '1' then '11' -- 11:男
@@ -64,7 +68,7 @@ SELECT
     else 
         null-- 其它
     end  		nation,
-    case c_cert_cls
+    case p.c_cert_cls
     when  '120001' then 11 -- 居民身份证
     when  '120002' then 13 -- 护照
     when  '120003' then 12 -- 军人证
@@ -75,7 +79,7 @@ SELECT
     else 
     18 -- 其它
     end id_type,
-    c_cert_cde		id_no,
+    p.c_cert_cde		id_no,
     date_format(t_cert_end_date,'%Y%m%d')		id_deadline,
     /* 职业代码 unpass*/  -- 填写职业代码。
     c_occup_cde		occupation_code,
@@ -91,8 +95,7 @@ SELECT
     null		sys_name,
     '20191013000000' pt
 FROM edw_cust_pers_info partition(pt20191013000000) p
-    inner join edw_cust_ply_party partition(pt20191013000000) pp on p.c_cst_no = pp.c_cst_no
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = p.c_dpt_cde
-where pp.t_next_edr_udr_tm > {endday} 
-	and pp.t_app_tm between {beginday} and {endday}     
--- 受益人（受益人适用人身保险业务，财产保险业务无需提取）
+    inner join party pp on p.c_cst_no = pp.c_cst_no
+        left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = p.c_dpt_cde;
+	
+-- 受益人（受益人适用人身保险业务，财产保险业务无需提取

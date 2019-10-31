@@ -31,7 +31,9 @@
 --  受益人被保人之间的关系
 
 alter table edw_cust_ply_party truncate partition pt20191013000000;
--- select * from edw_cust_ply_party
+
+select now();
+
 drop table  if exists ply_party_tmp;
 create temporary table ply_party_tmp select * from edw_cust_ply_party where 1 = 2;
 
@@ -86,6 +88,8 @@ from (
                 and c_cert_cde is not null and trim(c_cert_cde)  <> ''
 ) v;
 
+select now();
+
 drop table if exists ply_party_info_tmp;
 
 create table ply_party_info_tmp 
@@ -103,6 +107,8 @@ select
 	c_certf_cde
 from edw_cust_units_info  partition(pt20191013000000);
 
+select now();
+
 drop table if exists ply_party_tmp_ins;
 
 create temporary table ply_party_tmp_ins 
@@ -111,8 +117,11 @@ from ply_party_tmp
 where c_per_biztype in (31,32) 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 group by c_app_no;
 
+select now();
+
 drop table if exists ply_party_tmp2;
 create temporary table ply_party_tmp2 select * from edw_cust_ply_party where 1 = 2;
+
 INSERT INTO ply_party_tmp2(
     c_dpt_cde,
     c_cst_no,
@@ -123,8 +132,8 @@ INSERT INTO ply_party_tmp2(
     c_ins_app_rel, -- 被保险人与投保人之间的关系
     t_bgn_tm,
     t_end_tm,
-    b.t_app_tm, -- 投保日期
-    b.t_next_edr_udr_tm, -- 下次批改核保日期 
+    t_app_tm, -- 投保日期
+    t_next_edr_udr_tm, -- 下次批改核保日期 
     c_clnt_mrk,   -- 客户分类,0 法人，1 个人
     c_per_biztype 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 )
@@ -144,6 +153,10 @@ select
     l.c_per_biztype
 from ply_party_tmp l
 	left join ply_party_tmp_ins r on l.c_app_no = r.c_app_no ;
+
+select now();
+
+alter table ply_party_info_tmp  add index ply_party_info_tmp_ix1 (c_cst_no);
 
 insert into edw_cust_ply_party(
     c_dpt_cde	--  机构网点代码
@@ -184,3 +197,5 @@ SELECT distinct
     '20191013000000'	--  分区字段
 FROM ply_party_tmp2 m
     inner join ply_party_info_tmp p1 on m.c_cst_no = p1.c_cst_no;
+
+select now();

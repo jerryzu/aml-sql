@@ -80,8 +80,9 @@ from (select
 		@u:=c_clnt_cde 
     from
         ods_amltp_t_score partition(pt20191013000000),(select @u:=null, @r:=0) r 
-    where
-        app_or_ins = 1
+    where  app_or_ins = 1
+		and  c_certf_type is not null and trim(c_certf_type)  <> '' and c_certf_type REGEXP '[^0-9.]' = 0
+        and c_certf_cde is not null and trim(c_certf_cde)  <> '' and left(c_certf_cde, 17)  REGEXP '[^0-9.]' = 0
     order by
         c_clnt_cde, t_crt_tm
 ) v

@@ -26,6 +26,7 @@
 
 truncate table s_rpt_fxq_tb_ins_rpol_ms;
 
+select now();
 drop table if exists s_rpt_fxq_tb_ins_rpol_ms_tmp;
 
 create temporary table s_rpt_fxq_tb_ins_rpol_ms_tmp select * from s_rpt_fxq_tb_ins_rpol_ms;
@@ -69,6 +70,7 @@ where c_ins_no is not null and c_ins_no REGEXP '[^0-9.]' = 0 and c_bnfc_no is no
 
 /*个单 被保人受益人--这部分保单被保人通过保单一多关系*/
 
+select now();
 drop table if exists s_rpt_fxq_tb_ins_rpol_ms_tmp_single;
 
 create temporary table s_rpt_fxq_tb_ins_rpol_ms_tmp_single select * from s_rpt_fxq_tb_ins_rpol_ms;
@@ -155,6 +157,7 @@ from (
 where c_ins_no is not null and c_ins_no REGEXP '[^0-9.]' = 0 and c_bnfc_no is not null and c_bnfc_no REGEXP '[^0-9.]' = 0;
 
 
+select now();
 drop table if exists edw_cust_partys_info_tmp;
 
 create temporary table edw_cust_partys_info_tmp 
@@ -177,6 +180,7 @@ from edw_cust_units_info partition(pt20191013000000);
 以下sql多表关联运行不出来，准备修改成两两关联
 */
 
+select now();
 drop table if exists s_rpt_fxq_tb_ins_rpol_ms_tmp2;
 
 create temporary table s_rpt_fxq_tb_ins_rpol_ms_tmp2 select * from s_rpt_fxq_tb_ins_rpol_ms;
@@ -218,6 +222,7 @@ FROM s_rpt_fxq_tb_ins_rpol_ms_tmp m
     inner join edw_cust_partys_info_tmp p1 on m.c_ins_no = p1.c_cst_no;
     -- inner join edw_cust_partys_info_tmp p2 on m.c_bnfc_no = p2.c_cst_no;
 
+select now();
 insert into s_rpt_fxq_tb_ins_rpol_ms(
     c_dpt_cde,
     c_ins_no,
@@ -254,3 +259,5 @@ SELECT
 FROM s_rpt_fxq_tb_ins_rpol_ms_tmp2 m
     -- inner join edw_cust_partys_info_tmp p1 on m.c_insured_no = p1.c_cst_no
     inner join edw_cust_partys_info_tmp p2 on m.c_bnfc_no = p2.c_cst_no;   
+
+select now();	

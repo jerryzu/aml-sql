@@ -65,4 +65,6 @@ from x_rpt_fxq_tb_ins_rpol_gpol m
     left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 where e.c_rsn_cde in ('22','-J1','-Z1') -- and m.t_next_edr_udr_tm > now()  
     and m.n_prm_var <> 0 --  测试此条件没有满足记录
+	/*
 	and m.t_app_tm between {beginday} and {endday} 
+	*/

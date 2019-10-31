@@ -70,7 +70,6 @@ INSERT INTO rpt_fxq_tb_ins_rpol_ms(
         receipt_no,
         pt
 )
-
 select 
         m.c_dpt_cde as company_codel,-- 机构网点代码
         co.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
@@ -205,11 +204,12 @@ select
 from x_rpt_fxq_tb_ins_rpol_gpol m
         --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 		inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_per_biztype = 21 
-		inner join s_rpt_fxq_tb_ins_rpol_ms i on m.c_ply_no =i.c_ply_no --此表为被保人,受益人关系表
+		inner join s_rpt_fxq_tb_ins_rpol_ms i on m.c_ply_no =i.c_ply_no -- 此表为被保人,受益人关系表
         inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
+/*		
 where m.t_next_edr_udr_tm > {endday} 
 	and m.t_app_tm between {beginday} and {endday} 
-
+*/
 
 --   3.指定受益人为法定受益人中的一人或若干人时，不填写本表受益人相关字段。  
 --   4.单个被保险人涉及多个指定受益人（非法定受益人）的，合并生成一条记录，指定受益人的姓名、身份证件号码用半角隔开。  

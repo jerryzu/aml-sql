@@ -5,7 +5,7 @@
 --  1.关联保单中间表(x_rpt_fxq_tb_ins_rpol_gpol)与理赔主单(ods_cthx_web_clm_main)生成理赔保单,再次关联保单相关方(edw_cust_ply_party)取出投保人信息，得到含保单，理赔单，投保人信息表
 --  2.取出保单号，申请单号，理赔单号用于获取对应理赔的被保人与受益人信息
 --  3.通过步骤2取出的申请单号过滤团单成员表(ods_cthx_web_app_grp_member)中获取团单对应的被保人与受益人信息
---  4.通过步骤2取出的申请单号两次关联(x_edw_cust_pers_units_info)取个单对应的被保人与受益人
+--  4.通过步骤2取出的申请单号两次关联保单相关方(edw_cust_ply_party)取个单对应的被保人与受益人
 --  5.合并个单与团单形成最终保单，被保人，受益人对应关系表
 --  6.合并客户主题自然人客户(edw_cust_pers_info)与非自然人客户(edw_cust_units_info)，形成完整客户信息
 --  7.使用步骤5.的保单，被保人，受益人对应表关联合并后客户信息表获取一致化的保单，投保人，被保人，受益人对应关系表
@@ -17,8 +17,7 @@
 --  ods_cthx_web_clm_main -- 理赔主表,用于关联保单信息与理赔信息
 --  ods_cthx_web_app_grp_member -- 团单成员,用于取团单被保人与受益人对应关系
 --  x_rpt_fxq_tb_ins_rpol_gpol -- 保单中间表(包括个单与团单),用于获取保单信息
---  x_edw_cust_pers_units_info --  保单分类客户信息(投保人信息,被保人信息,受益人信息,每个一条记录),用于获取被保人与受益人信息
---  edw_cust_ply_party -- 保单相关方,用于获取投保人信息
+--  edw_cust_ply_party -- 保单相关方,用于获取投保人、被保人与受益人信息
 --  edw_cust_pers_info -- 客户主题-自然人信息表,用于获取自然人客户信息
 --  edw_cust_units_info --  客户主题-非自然人信息表,用于获取非自然人客户信息
 --  rpt_fxq_tb_company_ms 
@@ -30,34 +29,6 @@
 --  修改人: 
 --  修改内容：
 --  说明：
-
-drop table if exists s_rpt_fxq_tb_ins_rcla_ms;
-create table s_rpt_fxq_tb_ins_rcla_ms (
-    company_code1	varchar(20)	comment '机构网点代码',
-    company_code2	varchar(16)	comment '金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”',
-    company_code3	varchar(20)	comment '保单归属机构网点代码',
-    company_code4	varchar(20)	comment '受理业务机构网点代码',
-    c_clm_no	varchar(60)	comment '赔案号',
-    c_ply_no	varchar(60)	comment '保单号',
-    c_app_no	varchar(60)	comment '投保单号',
-    t_app_tm	datetime          comment '投保日期',
-    t_insrnc_bgn_tm	datetime	comment '保单起效日期',
-    app_name	varchar(120)	comment '投保人名称',
-    app_cst_no	varchar(30)	comment '投保人客户号',
-    app_id_no	varchar(30)	comment '投保人证件号码',
-    c_app_clnt_mrk	varchar(2)	comment '投保人客户类型 11:个人;12:单位',
-    ins_name	varchar(120)	comment '被保险人客户名称',
-    ins_cst_no	varchar(30)	comment '被保险人客户号',
-    ins_id_no	varchar(50)	comment '被保险人证件号码',
-    c_ins_clnt_mrk	varchar(2)	comment '被保险人客户类型 11:个人;12:单位',
-    benefit_name	varchar(120)	comment '受益人名称',
-    benefit_id_no	varchar(50)	comment '受益人身份证件号码',
-    c_bnfc_clnt_mrk	varchar(2)	comment '受益人类型 11:个人;12:单位',
-    relation_1	varchar(2)	comment '投保人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;17:其他',
-    relation_2	varchar(2)	comment '受益人被保人之间的关系 11:本人;12:配偶;13:父母;14:子女;15:其他近亲属;16:雇佣或劳务;18:其他',
-    tsf_flag	varchar(2)	comment '现转标识',
-    receipt_no	varchar(40)	comment ''
-);
 
 drop table if exists clm_ply;
 create temporary table clm_ply
@@ -77,7 +48,10 @@ from  ods_cthx_web_clm_main partition(pt20191013000000) cm -- 8472
 	inner join x_rpt_fxq_tb_ins_rpol_gpol m on cm.c_ply_no = m.c_ply_no -- 理赔主表  1194
 	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on cm.c_clm_no=g.c_clm_no -- 领款人 1480    
+/*	
 where g.t_pay_tm between {beginday} and {endday}; -- 支付时间
+*/
+;
 
 drop table if exists clm_ply_app;
 create temporary table clm_ply_app

@@ -60,7 +60,7 @@ from rpt_fxq_tb_amltp_entity  partition (pt20191013000000) e
 		select c_cst_no, c_certf_cls, c_certf_cde, c_acc_name, c_dpt_cde from edw_cust_units_info partition (pt20191013000000)
 	--  ) pi on e.c_cst_no = pi.c_cst_no
 	) pi on e.c_cert_type = pi.c_cert_cls and e.c_cert_cde = pi.c_cert_cde
-    inner join  rpt_fxq_manual_company_ms partition (pt20191013000000) co on co.company_code1 = pi.c_dpt_cde
+    inner join  rpt_fxq_manual_company_ms co on co.company_code1 = pi.c_dpt_cde
 where 	e.c_cert_type is not null and trim(e.c_cert_type)  <> '' and e.c_cert_type REGEXP '[^0-9.]' = 0
 			and e.c_cert_cde is not null and trim(e.c_cert_cde)  <> '' 
 order by r.c_clnt_cde, r.score_time;
