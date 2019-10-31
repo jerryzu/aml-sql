@@ -62,7 +62,7 @@ select
         else 
         null-- 其它
     end	as insbene_cus_pro,-- 被保人或受益人类型 11：个人；12：单位
-	case a.c_app_ins_relation
+	case a.c_app_ins_rel
 	when '601001' then '12' -- 配偶
 	when '601002' then '13' -- 父母
 	when '601003' then '14' -- 子女

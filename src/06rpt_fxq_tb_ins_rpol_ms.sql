@@ -128,7 +128,7 @@ select
         else 
         null-- 其它
         end	as ins_cus_pro,-- 被保险人客户类型 11:个人;12:单位
-        case a.c_app_ins_rel 
+        case a.c_app_ins_rel
         -- select concat('when ''', c_cde, ''' then '' '' -- ',  c_cnm) from web_bas_comm_code partition(pt20191013000000) where c_par_cde = '601' order by c_cde 
         -- 11: 本人； 12：配偶； 13：父母； 14：子女 15：其他近亲属 16 雇佣或劳务 17：其他  --tb_ins_rpay  tb_ins_rpol
         when '601001' then '12' -- 配偶

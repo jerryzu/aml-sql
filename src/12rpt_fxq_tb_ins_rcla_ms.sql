@@ -13,7 +13,7 @@
 --  创建者:祖新合 
 --  输入:  
 --  s_rpt_fxq_tb_ins_rcla_ms  -- 理赔保单中间表
---  ods_cthx_web_clm_rpt  -- 理赔申请人（理赔号唯一) 
+--  ods_cthx_web_clm_rpt  -- 理赔申请人(理赔号唯一) 
 --  ods_cthx_web_clm_accdnt  -- 出险表(用于取出被保险人信息,关联结案表确定被保人,但由于关联关系暂末确定)，使用赔案号与客户号(c_ins_no[c_cst_no])关联
 --  ods_cthx_web_clmnv_endcase  -- 结案
 --  ods_cthx_web_clm_bank -- 领款人
@@ -41,6 +41,8 @@ select
         c_clm_no
         ,c_cert_typ
         ,c_cert_no
+        ,c_insured_cde	
+        ,c_insured_nme	
         ,case left(c_cert_typ,2) 
         when 10 then   -- 客户分类,0 法人，1 个人
                 concat('2', concat(rpad(c_cert_typ, 6, '0') , rpad(c_cert_no, 18, '0')), mod(substr(concat(rpad(c_cert_typ, 6, '0') , rpad(c_cert_no, 18, '0')), -7, 6), 9)) 
@@ -52,8 +54,6 @@ select
 from ods_cthx_web_clm_accdnt partition(pt20191013000000) 	
 where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0
 and c_cert_no is not null and trim(c_cert_no)  <> '' and left(c_cert_no, 17)  REGEXP '[^0-9.]' = 0;
-
-
 
 INSERT INTO rpt_fxq_tb_ins_rcla_ms(
 	company_code1,
@@ -159,7 +159,7 @@ select
     '20191013000000' pt
 from s_rpt_fxq_tb_ins_rcla_ms cm
 	inner join ods_cthx_web_clm_rpt partition(pt20191013000000) e on cm.c_clm_no=e.c_clm_no -- 理赔申请人（理赔号唯一)  1054
-	inner join clm_accdnt ac on cm.c_clm_no = ac.c_clm_no and cm.ins_cst_no = ac.c_ins_no-- 出险表   58	
+	inner join clm_accdnt ac on cm.c_clm_no = ac.c_clm_no and cm.ins_cst_no = ac.c_ins_no-- 出险表   58	--不用C_INSURED_CDE因为团单没找到被保人号码
 	inner join ods_cthx_web_clmnv_endcase partition(pt20191013000000) u on cm.c_clm_no = u.c_clm_no -- 结案  47
 	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on cm.c_clm_no=g.c_clm_no -- 领款人    75
 where g.t_pay_tm between {beginday} and {endday}; -- 支付时间

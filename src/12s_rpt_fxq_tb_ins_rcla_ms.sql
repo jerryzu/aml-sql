@@ -75,7 +75,7 @@ select
         cm.c_clm_no as receipt_no -- 作业流水号,唯一标识号
 from  ods_cthx_web_clm_main partition(pt20191013000000) cm -- 8472
 	inner join x_rpt_fxq_tb_ins_rpol_gpol m on cm.c_ply_no = m.c_ply_no -- 理赔主表  1194
-	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde;
+	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
 	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on cm.c_clm_no=g.c_clm_no -- 领款人 1480    
 where g.t_pay_tm between {beginday} and {endday}; -- 支付时间
 
@@ -131,7 +131,7 @@ from (select
         inner join clm_ply_no pn
             on gmb.c_app_no = pn.c_app_no
     where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0 and c_cert_no is not null and trim(c_cert_no)  <> '' 
-    and c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0 and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' 
+        and c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0 and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' 
 ) v
 where c_ins_no is not null and c_ins_no REGEXP '[^0-9.]' = 0 and c_bnfc_no is not null and c_bnfc_no REGEXP '[^0-9.]' = 0;
 
@@ -146,18 +146,17 @@ select distinct
     ,c_ins_clnt_mrk -- 被保险人客户分类,0 法人，1 个人 团单默认为1 个人
     ,c_ins_app_rel -- 被保险人与投保人之间的关系
  from (
-        select 
-            m.c_clm_no
-            ,m.c_ply_no
-            ,m.c_app_no
-            ,i.c_cst_no  c_ins_no -- 被保人编码  
-            ,i.c_clnt_mrk c_ins_clnt_mrk
-            ,i.c_ins_app_rel -- 被保险人与投保人之间的关系
-        from clm_ply_no m  
-            --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-            --  inner join edw_cust_ply_party  i on m.c_app_no = i.c_app_no and i.c_per_biztype in (31, 32)  -- 156
-    		inner join x_edw_cust_pers_units_info  i on m.c_app_no = i.c_app_no and i.c_per_biztype in (31, 32)  
-        where i.c_cert_cls is not null and trim(i.c_cert_cls)  <> '' and i.c_cert_cls REGEXP '[^0-9.]' = 0 and i.c_cert_cde is not null and trim(i.c_cert_cde)  <> '' 
+    select 
+        m.c_clm_no
+        ,m.c_ply_no
+        ,m.c_app_no
+        ,i.c_cst_no  c_ins_no -- 被保人编码  
+        ,i.c_clnt_mrk c_ins_clnt_mrk
+        ,i.c_ins_app_rel -- 被保险人与投保人之间的关系
+    from clm_ply_no m  
+        --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
+        inner join edw_cust_ply_party  i on m.c_app_no = i.c_app_no and i.c_per_biztype in (31, 32)  -- 156
+    where i.c_cert_cls is not null and trim(i.c_cert_cls)  <> '' and i.c_cert_cls REGEXP '[^0-9.]' = 0 and i.c_cert_cde is not null and trim(i.c_cert_cde)  <> '' 
 ) v
 where c_ins_no is not null and c_ins_no REGEXP '[^0-9.]' = 0;
 
@@ -185,9 +184,8 @@ from (
             ,m.c_ins_app_rel -- 被保险人与投保人之间的关系
             ,b.c_bnfc_ins_rel -- 受益人与被保险人之间的关系
         from single_ins m  
-                --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-                -- inner join edw_cust_ply_party  b on m.c_app_no = b.c_app_no and b.c_per_biztype in (41, 42) 
-                inner join x_edw_cust_pers_units_info  b on m.c_app_no = b.c_app_no and b.c_per_biztype in (41, 42) 
+            --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
+            inner join edw_cust_ply_party  b on m.c_app_no = b.c_app_no and b.c_per_biztype in (41, 42)
         where b.c_cert_cls is not null and trim(b.c_cert_cls)  <> '' and b.c_cert_cls REGEXP '[^0-9.]' = 0 and b.c_cert_cde is not null and trim(b.c_cert_cde)  <> '' 
 ) v
 where c_ins_no is not null and c_ins_no REGEXP '[^0-9.]' = 0 and c_bnfc_no is not null and c_bnfc_no REGEXP '[^0-9.]' = 0;

@@ -64,3 +64,21 @@ group by c_clm_no
 order by rcx desc
 
 可增加出险被保人关系表？
+
+--重复
+select c_app_cde, count(1) rc
+from  ods_cthx_web_ply_insured partition(pt20191013000000)
+group by c_app_cde
+order by rc desc
+
+--重复
+select c_app_cde, count(1) rc
+from  ods_cthx_web_ply_applicant partition(pt20191013000000)
+group by c_app_cde
+order by rc desc
+
+--重复(全空)
+select c_bnfc_cde, count(1) rc
+from  ods_cthx_web_ply_bnfc partition(pt20191013000000)
+group by c_bnfc_cde
+order by rc desc
