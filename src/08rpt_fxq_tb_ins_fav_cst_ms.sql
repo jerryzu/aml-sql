@@ -23,7 +23,7 @@
 -- 说明：
 --   提取表七涉及的保单对应的被保险人、受益人信息，按被保险人、受益人分别增加记录；如一份保单存在多个被保险人或受益人的，需逐条增加记录。
 
-alter table rpt_fxq_tb_ins_fav_cst_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_fav_cst_ms truncate partition pt{workday}000000;
 
 INSERT INTO rpt_fxq_tb_ins_fav_cst_ms(
         company_code1,
@@ -84,23 +84,14 @@ select
 	i.c_acc_name as name,-- 被保人或受益人名称
     i.c_cst_no as insbene_cst_no,-- 被保险人或受益人客户号
 	i.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
-    '20191013000000' pt
+    '{workday}000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  22
-	inner join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no and i.c_per_biztype in (31, 32, 33)
-	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-/*	
-where m.t_next_edr_udr_tm > {endday} and a.c_clnt_mrk = 0
-	and m.t_app_tm between {beginday} and {endday} 
-*/
-
-
-
-
-
-
-
+	inner join edw_cust_ply_party partition(pt{workday}000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  22
+	inner join edw_cust_ply_party partition(pt{workday}000000) i on m.c_app_no=i.c_app_no and i.c_per_biztype in (31, 32, 33)
+	inner join rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = m.c_dpt_cde
+where m.t_next_edr_udr_tm > str_to_date('{endday}235959','%Y%m%d%H%i%s') and a.c_clnt_mrk = 0
+	and m.t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s')
 union all
 /* 受益人部分提取*/
 select
@@ -127,14 +118,11 @@ select
 	b.c_acc_name as name,-- 被保人或受益人名称
 	concat(rpad(b.c_cert_cls, 6, '0') , rpad(b.c_cert_cde, 18, '0')) as insbene_cst_no,-- 被保险人或受益人客户号
 	b.c_cert_cde as insbene_id_no,-- 被保险人或受益人身份证件号码
-	'20191013000000' pt	
+	'{workday}000000' pt	
 from x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  22 
-	inner join edw_cust_ply_party partition(pt20191013000000) b on m.c_app_no=b.c_app_no and b.c_per_biztype in (41, 42, 43) 
-	inner join rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-
-/*	
-where m.t_next_edr_udr_tm > {endday} and a.c_clnt_mrk = 0
-	and m.t_app_tm between {beginday} and {endday} 
-*/	
+	inner join edw_cust_ply_party partition(pt{workday}000000) a on m.c_app_no=a.c_app_no and a.c_per_biztype =  22 
+	inner join edw_cust_ply_party partition(pt{workday}000000) b on m.c_app_no=b.c_app_no and b.c_per_biztype in (41, 42, 43) 
+	inner join rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = m.c_dpt_cde
+where m.t_next_edr_udr_tm > str_to_date('{endday}235959','%Y%m%d%H%i%s') and a.c_clnt_mrk = 0
+	and m.t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s');

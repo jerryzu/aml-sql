@@ -20,11 +20,12 @@
 --   1.取出表六至表十三涉及的所有投保人、被保险人、受益人（受益人适用人身保险业务，财产保险业务无需提取）、实际领款人为单位时的客户身份信息，如涉及多个系统存储客户身份信息的，应分别从各系统取数，确保提供要素的完整性。
 --   2.一个单位客户存在多个控股股东或实际控制人的，每个控股股东或实际控制人生成一条记录。
 
-alter table rpt_fxq_tb_ins_unit_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_unit_ms truncate partition pt{workday}000000;
 
 drop table if exists party;
 
-create temporary table party select distinct c_cst_no from edw_cust_ply_party partition(pt20191013000000)   /* where t_next_edr_udr_tm > {endday} 	and t_app_tm between {beginday} and {endday}  */;
+create temporary table party select distinct c_cst_no from edw_cust_ply_party partition(pt{workday}000000)   
+where t_next_edr_udr_tm > str_to_date('{endday}235959','%Y%m%d%H%i%s')	and t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s');
 
 INSERT INTO rpt_fxq_tb_ins_unit_ms(
     company_code1,
@@ -126,7 +127,7 @@ SELECT
     /* 注册资本金币种 unpass*/   -- 采用国标, 如CNY、USD等; 下同。
     null	        code	,
     null	        sys_name	,
-    '20191013000000' pt
-FROM edw_cust_units_info partition(pt20191013000000) u
+    '{workday}000000' pt
+FROM edw_cust_units_info partition(pt{workday}000000) u
     inner join party pp on u.c_cst_no = pp.c_cst_no
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = u.c_dpt_cde;
+    left join  rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = u.c_dpt_cde;

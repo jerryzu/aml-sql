@@ -27,7 +27,7 @@
 --    4.单个被保险人涉及多个指定受益人（非法定受益人）的，合并生成一条记录，指定受益人的姓名、身份证件号码用半角隔开。  
 --    5.对同一份保单、多个被保险人、每个被保险人涉及多个险种情形，每个险种单独生成一条记录。
 
-alter table rpt_fxq_tb_ins_rpol_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_rpol_ms truncate partition pt{workday}000000;
 
 INSERT INTO rpt_fxq_tb_ins_rpol_ms(
         company_code1,
@@ -76,7 +76,7 @@ select
         m.c_dpt_cde as company_code3,-- 保单归属机构网点代码
         m.c_ply_no as  pol_no,-- 保单号
         m.c_app_no as app_no,-- 投保单号
-        case when m.c_edr_type in ('2','3') or m.t_insrnc_bgn_tm > str_to_date('20191013', '%Y%m%d') or m.t_insrnc_end_tm < str_to_date('20191013', '%Y%m%d') then 12 else 11 end as ins_state,-- 保单状态 --edr_type in ('2','3') or  T_INSRNC_END_TM<=date then 终止 else 有效
+        case when m.c_edr_type in ('2','3') or m.t_insrnc_bgn_tm > str_to_date('{workday}', '%Y%m%d') or m.t_insrnc_end_tm < str_to_date('{workday}', '%Y%m%d') then 12 else 11 end as ins_state,-- 保单状态 --edr_type in ('2','3') or  T_INSRNC_END_TM<=date then 终止 else 有效
 		case m.c_cha_subtype 
 				-- 财产保险销售渠道:11:个人代理;12:保险代理机构或经济机构;13:银邮代理;14:网销(本机构);15:电销;16:农村网点;17:营业网点;18:第三方平台;19:其他;
 				when '0A0' then 17	--	营业网点
@@ -98,7 +98,7 @@ select
 		end as sale_type,-- 销售渠道
         -- 个人代理：为代理人名称；银保通代理点：**银行**分行等
 		/* 销售渠道名称 unpass*/   -- 对应Sale_type销售渠道填写。如销售渠道为"个人代理", 则本字段填写为个人代理人名称(如"张**"); 销售渠道为"银保通代理点", 则本字段填写为"**银行**分行, 等。
-        (select c_cha_nme from ods_cthx_web_cus_cha partition(pt20191013000000)  v where v.c_cha_cde = m.c_brkr_cde) as sale_name,-- 销售渠道名称
+        (select c_cha_nme from ods_cthx_web_cus_cha partition(pt{workday}000000)  v where v.c_cha_cde = m.c_brkr_cde) as sale_name,-- 销售渠道名称
         date_format(m.t_app_tm,'%Y%m%d') as ins_date,-- 投保日期
         date_format(m.t_insrnc_bgn_tm,'%Y%m%d') as eff_date,-- 合同生效日期
         a.c_acc_name as app_name,-- 投保人名称
@@ -128,7 +128,7 @@ select
         null-- 其它
         end	as ins_cus_pro,-- 被保险人客户类型 11:个人;12:单位
         case a.c_app_ins_rel
-        -- select concat('when ''', c_cde, ''' then '' '' -- ',  c_cnm) from web_bas_comm_code partition(pt20191013000000) where c_par_cde = '601' order by c_cde 
+        -- select concat('when ''', c_cde, ''' then '' '' -- ',  c_cnm) from web_bas_comm_code partition(pt{workday}000000) where c_par_cde = '601' order by c_cde 
         -- 11: 本人； 12：配偶； 13：父母； 14：子女 15：其他近亲属 16 雇佣或劳务 17：其他  --tb_ins_rpay  tb_ins_rpol
         when '601001' then '12' -- 配偶
         when '601002' then '13' -- 父母
@@ -200,17 +200,15 @@ select
     	m.acc_no          as acc_no,-- 交费账号
     	m.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     	m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
-        '20191013000000'		pt
+        '{workday}000000'		pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
         --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-		inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_ply_no =a.c_ply_no and a.c_per_biztype = 21 
+		inner join edw_cust_ply_party   partition(pt{workday}000000) a on m.c_ply_no =a.c_ply_no and a.c_per_biztype = 21 
 		inner join s_rpt_fxq_tb_ins_rpol_ms i on m.c_ply_no =i.c_ply_no -- 此表为被保人,受益人关系表
-        inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-/*		
-where m.t_next_edr_udr_tm > {endday} 
-	and m.t_app_tm between {beginday} and {endday} 
-*/
-
+        inner join  rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = m.c_dpt_cde	
+where m.t_next_edr_udr_tm > str_to_date('{endday}235959','%Y%m%d%H%i%s')
+	and m.t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s')
+    
 --   3.指定受益人为法定受益人中的一人或若干人时，不填写本表受益人相关字段。  
 --   4.单个被保险人涉及多个指定受益人（非法定受益人）的，合并生成一条记录，指定受益人的姓名、身份证件号码用半角隔开。  
 --   5.对同一份保单、多个被保险人、每个被保险人涉及多个险种情形，每个险种单独生成一条记录。

@@ -16,7 +16,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_amltp_score truncate partition pt20191013000000;
+alter table rpt_fxq_tb_amltp_score truncate partition pt{workday}000000;
 
 insert into rpt_fxq_tb_amltp_score(
 	c_clnt_cde,
@@ -30,7 +30,7 @@ select
     bat,
     score,
     score_time,
-    '20191013000000' pt	--	分区字段
+    '{workday}000000' pt	--	分区字段
 from (select
         t.user_id,
         t.bat,
@@ -41,7 +41,7 @@ from (select
         @u:=                             user_id,
         @s:=                             score_time
     from 
-        ods_amltp_t_sco partition(pt20191013000000)  t,  (select @u:=null, @s:=null, @r:=0, @n:=0) r
+        ods_amltp_t_sco partition(pt{workday}000000)  t,  (select @u:=null, @s:=null, @r:=0, @n:=0) r
     where 
         t.app_or_ins = 1 and previous_score is not null --  and t.status
     order by

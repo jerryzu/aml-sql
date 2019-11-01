@@ -19,8 +19,12 @@
 --  修改日期: 
 --  修改人: 
 --  修改内容：
+--  说明：
+--   1.本表数据范围为检查期限内，检查对象的客户涉及的可疑交易报告明细，如一份可疑报告中涉及多个机构保险合同的的，需拆分提供归属于检查对象的交易报告。
+--   2.本表数据基础内容为向中国反洗钱监测分析中心成功上报的可疑交易报告明细，按照《金融机构大额交易和可疑交易报告管理办法》（中国人民银行令〔2016〕第3号发布）数据报送字典提供字段，即《中国反洗钱监测分析中心关于印发〈金融机构大额交易和可疑交易报告数据报送接口规范（V1.0）〉的通知》（银反洗中心发〔2017〕19号）、《中国反洗钱监测分析中心关于进一步明确大额交易和可疑交易报告数据报送要求的通知》（银反洗中心发〔2018〕13号）。
+--   3.本表数据释义请参考《中国人民银行关于大额交易和可疑交易报告要素及释义的通知》（银发〔2017〕98号）。
 
-alter table rpt_fxq_tb_sus_report_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_sus_report_ms truncate partition pt{workday}000000;
 
 insert into rpt_fxq_tb_sus_report_ms(
     ricd,
@@ -144,7 +148,7 @@ select distinct
     ,sc.isfe  as isfe  --  	保险费	
     ,sc.ispt  as ispt  --  	交费方式	 01:期缴;02:趸缴;99其他
     ,sc.ctes  as ctes  --  	保险合同其他信息	
-    ,date_format(sd.insert_time,'%Y%m%d%H%i%S')   as tstm  --  	交易时间	客户与保险公司发生资金收付时间 格式为年年年年月月日日时时分分秒秒
+    ,date_format(sd.insert_time,'%Y%m%d%H%i%s')   as tstm  --  	交易时间	客户与保险公司发生资金收付时间 格式为年年年年月月日日时时分分秒秒
     ,'CHN330104'  as trcd  --  	交易发生地	默认中国杭州江干区
     ,st.trans_type  as ittp  --  	交易类型	01:投保;02:领取;03:退保;99:其他保全项目
     ,st.crtp  as crtp  --  	币种	 需转换,数据库存入为货币符号需转换为对应的三位货币代码
@@ -178,11 +182,11 @@ select distinct
     ,sc2.address  as sear  --  	可疑主体住址/经营地址	
     ,null  as seei  --  	可疑主体其他联系方式	无此字段
     ,(select count(*) from ods_amltp_t_sus_customer t  where t.su_data_id = sc2.su_data_id)  as setn  --  	可疑主体总数
-    ,'20191013000000' pt	--	分区字段	
-from ods_amltp_t_is_bnif  partition(pt20191013000000)  bf
-    left join ods_amltp_t_is_iabi	 partition(pt20191013000000)  ii on bf.ibid = ii.ibid    
-    left join ods_amltp_t_sus_contract  partition(pt20191013000000)  sc on 	ii.icid = sc.policy_id
-    left join ods_amltp_t_sus_customer  partition(pt20191013000000)  sc2 on 	sc.su_data_id = sc2.su_data_id
-    left join ods_amltp_t_sus_data  partition(pt20191013000000)  sd on 	sc.su_data_id = sd.su_data_id
-    left join ods_amltp_t_sus_trans  partition(pt20191013000000)  st on 	sc.su_data_id = st.su_data_id
-    left join ods_cthx_web_prd_prod  partition(pt20191013000000)  pd on sc.product_id = pd.c_prod_no;
+    ,'{workday}000000' pt	--	分区字段	
+from ods_amltp_t_is_bnif  partition(pt{workday}000000)  bf
+    left join ods_amltp_t_is_iabi	 partition(pt{workday}000000)  ii on bf.ibid = ii.ibid    
+    left join ods_amltp_t_sus_contract  partition(pt{workday}000000)  sc on 	ii.icid = sc.policy_id
+    left join ods_amltp_t_sus_customer  partition(pt{workday}000000)  sc2 on 	sc.su_data_id = sc2.su_data_id
+    left join ods_amltp_t_sus_data  partition(pt{workday}000000)  sd on 	sc.su_data_id = sd.su_data_id
+    left join ods_amltp_t_sus_trans  partition(pt{workday}000000)  st on 	sc.su_data_id = st.su_data_id
+    left join ods_cthx_web_prd_prod  partition(pt{workday}000000)  pd on sc.product_id = pd.c_prod_no;

@@ -17,11 +17,12 @@
 --  修改内容：
 --  说明：  取出表六至表十三的所有投保人、被保险人、受益人（受益人适用人身保险业务，财产保险业务无需提取）、实际领款人为自然人时的客户身份信息，如涉及多个系统存储客户身份信息的，应分别从各系统取数，确保提供要素的完整性。
 
-alter table rpt_fxq_tb_ins_pers_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_pers_ms truncate partition pt{workday}000000;
 
 drop table if exists party;
 
-create temporary table party select distinct c_cst_no from edw_cust_ply_party partition(pt20191013000000)   /* where t_next_edr_udr_tm > {endday} 	and t_app_tm between {beginday} and {endday}  */;
+create temporary table party select distinct c_cst_no from edw_cust_ply_party partition(pt{workday}000000)   
+where t_next_edr_udr_tm > str_to_date('{endday}235959','%Y%m%d%H%i%s')	and t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s');
 
 INSERT INTO rpt_fxq_tb_ins_pers_ms(
         company_code1,
@@ -93,9 +94,9 @@ SELECT
     null		address3,
     c_work_dpt		company,
     null		sys_name,
-    '20191013000000' pt
-FROM edw_cust_pers_info partition(pt20191013000000) p
+    '{workday}000000' pt
+FROM edw_cust_pers_info partition(pt{workday}000000) p
     inner join party pp on p.c_cst_no = pp.c_cst_no
-        left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = p.c_dpt_cde;
+        left join  rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = p.c_dpt_cde;
 	
 -- 受益人（受益人适用人身保险业务，财产保险业务无需提取

@@ -16,8 +16,12 @@
 --  修改日期: 
 --  修改人: 
 --  修改内容：
+--  说明：
+--   1.本表数据范围为检查期限内，检查对象的客户涉及的大额交易报告明细。  
+--   2.本表数据基础内容为向中国反洗钱监测分析中心成功上报的大额交易报告明细，按照《金融机构大额交易和可疑交易报告管理办法》（中国人民银行令〔2016〕第3号发布）数据报送字典提供字段，即《中国反洗钱监测分析中心关于印发〈金融机构大额交易和可疑交易报告数据报送接口规范（V 1.0）〉的通知》（银反洗中心发〔2017〕19号）、《中国反洗钱监测分析中心关于进一步明确大额交易和可疑交易报告数据报送要求的通知》（银反洗中心发〔2018〕13号）。  
+--   3.本表数据释义请参考《中国人民银行关于大额交易和可疑交易报告要素及释义的通知》（银发〔2017〕98 号）。 
 
-alter table rpt_fxq_tb_lar_report_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_lar_report_ms truncate partition pt{workday}000000;
 
 insert into rpt_fxq_tb_lar_report_ms(
     ricd,
@@ -154,7 +158,7 @@ select
     ,null		ocec	  --  	非柜台交易方式的设备代码
 	/* 交易信息备注 */  -- 暂填写"@N"
     ,null		rotf	  --  	交易信息备注
-    ,'20191013000000' pt	--	分区字段
-from ods_amltp_t_lat_data  partition(pt20191013000000)  d 
-    inner join ods_amltp_t_lat_customer  partition(pt20191013000000)  c on d.r_cust_id = c.r_cust_id
-    inner join ods_amltp_t_ih_tsdt  partition(pt20191013000000)  t on d.app_no = t.app_no
+    ,'{workday}000000' pt	--	分区字段
+from ods_amltp_t_lat_data  partition(pt{workday}000000)  d 
+    inner join ods_amltp_t_lat_customer  partition(pt{workday}000000)  c on d.r_cust_id = c.r_cust_id
+    inner join ods_amltp_t_ih_tsdt  partition(pt{workday}000000)  t on d.app_no = t.app_no

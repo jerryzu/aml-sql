@@ -16,7 +16,7 @@
 --   1.本表数据范围为检查业务期限内，检查对象所有给付信息，每一笔业务生成一条完整的记录。  
 --   2.本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。
 
-alter table rpt_fxq_tb_ins_rpay_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_rpay_ms truncate partition pt{workday}000000;
 /*
 INSERT INTO rpt_fxq_tb_ins_rpay_ms(
         company_code1,
@@ -93,14 +93,14 @@ select
     m.acc_no          as acc_no,-- 交费账号
     m.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
-    '20191013000000' pt
+    '{workday}000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	left join edw_cust_ply_party partition(pt20191013000000) a on m.c_app_no=a.c_app_no  and a.c_per_biztype in (21, 22)
-	left join edw_cust_ply_party partition(pt20191013000000) i on m.c_app_no=i.c_app_no
-	left join edw_cust_ply_party partition(pt20191013000000) b on  m.c_app_no=b.c_app_no
-	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on m.c_dpt_cde = co.company_code1
-where 1 = 1 and m.t_next_edr_udr_tm > {endday} 
-	and m.t_app_tm between {beginday} and {endday} 
+	left join edw_cust_ply_party partition(pt{workday}000000) a on m.c_app_no=a.c_app_no  and a.c_per_biztype in (21, 22)
+	left join edw_cust_ply_party partition(pt{workday}000000) i on m.c_app_no=i.c_app_no
+	left join edw_cust_ply_party partition(pt{workday}000000) b on  m.c_app_no=b.c_app_no
+	left join  rpt_fxq_tb_company_ms partition (pt{workday}000000) co on m.c_dpt_cde = co.company_code1
+where 1 = 1 and m.t_next_edr_udr_tm > str_to_date('{endday}235959','%Y%m%d%H%i%s')
+	and m.t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s')
 */
 --   本表适用人身保险业务，主要包含生存金给付、满期金给付等业务。注:本表建立索引字段，创建两个组合索引和一个独立索引。

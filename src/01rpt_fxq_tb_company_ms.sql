@@ -16,7 +16,7 @@
 --  修改内容：
 --  说明：  本表数据范围为被检查对象所属法人机构及其全系统内所有向客户提供金融服务（产品）的分支机构或部门条线，每个分支机构或部门生成一条完整的记录。
 
-alter table rpt_fxq_tb_company_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_company_ms truncate partition pt{workday}000000;
 
 insert into rpt_fxq_tb_company_ms (
     head_no, 
@@ -31,7 +31,7 @@ select c.head_no as head_no, -- 法人机构报告机构编码，央行统一分
     c.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
     d.c_dpt_cnm as company_name, -- 机构名称
     c.bord_flag as  bord_flag, -- 制定经营地点，10境内、11境外 --ref
-    '20191013000000' pt
-from ods_cthx_web_org_dpt partition(pt20191013000000) d
+    '{workday}000000' pt
+from ods_cthx_web_org_dpt partition(pt{workday}000000) d
     inner join  rpt_fxq_manual_company_ms partition(future) c 
 		on c.company_code1 = d.c_dpt_cde

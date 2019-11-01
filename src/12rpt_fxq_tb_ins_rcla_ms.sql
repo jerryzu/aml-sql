@@ -32,7 +32,7 @@
 
 --  投保人，被保人，受益人，[投保人、被保人关系|被保人、受益人关系]，理赔申请人，实际领款人,理赔金额[实际领款人领取的理赔款项金额]，
 
-alter table rpt_fxq_tb_ins_rcla_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_rcla_ms truncate partition pt{workday}000000;
 
 drop table if exists clm_accdnt;
 
@@ -51,7 +51,7 @@ select distinct
         when 12 then  -- 客户分类,0 法人，1 个人
                 concat('1', concat(rpad(c_cert_typ, 6, '0') , rpad(c_cert_no, 18, '0')), mod(substr(concat(rpad(c_cert_typ, 6, '0') , rpad(c_cert_no, 18, '0')), -7, 6), 9)) 
         end c_ins_no
-from ods_cthx_web_clm_accdnt partition(pt20191013000000) 	
+from ods_cthx_web_clm_accdnt partition(pt{workday}000000) 	
 where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0
 	and c_cert_no is not null and trim(c_cert_no)  <> '' and left(c_cert_no, 17)  REGEXP '[^0-9.]' = 0;
 
@@ -59,7 +59,7 @@ where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '
 drop table if exists clm_pay;
 
 create temporary table clm_pay
-select 
+select distinct
     e.c_clm_no,
 	e.c_rptman_nme as cla_app_name,-- 理赔申请人名称 11:居民身份证或临时身份证;12:军人或武警身份证件;13:港澳居民来往内地通行证,台湾居民来往大陆通行证或其他有效旅游证件;14:港澳台居民居住证;15:外国公民护照;16:户口簿;17:出生证;18:其他类个人身份证件;21:营业执照;22:其他,
 	'' as  cla_id_type,-- 理赔申请人身份证件类型
@@ -94,13 +94,11 @@ select
 		18 -- 其它
 	end as acc_id_type,-- 实际领款人身份证件类型 11:居民身份证或临时身份证;12:军人或武警身份证件;13:港澳居民来往内地通行证,台湾居民来往大陆通行证或其他有效旅游证件;14:港澳台居民居住证;15:外国公民护照;16:户口簿;17:出生证;18:其他类个人身份证件;21:营业执照;22:其他,
 	g.c_id_card as acc_id_no,-- 实际领款人身份证件号码
-    '20191013000000' pt
-from  ods_cthx_web_clm_rpt partition(pt20191013000000) e-- 理赔申请人（理赔号唯一)  1054
-	inner join ods_cthx_web_clmnv_endcase partition(pt20191013000000) u on e.c_clm_no = u.c_clm_no -- 结案  47
-	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on e.c_clm_no=g.c_clm_no;  -- 领款人    75
-/*	
-where g.t_pay_tm between {beginday} and {endday}; -- 支付时间
-*/
+    '{workday}000000' pt
+from  ods_cthx_web_clm_rpt partition(pt{workday}000000) e-- 理赔申请人（理赔号唯一)  1054
+	inner join ods_cthx_web_clmnv_endcase partition(pt{workday}000000) u on e.c_clm_no = u.c_clm_no -- 结案  47
+	inner join ods_cthx_web_clm_bank partition(pt{workday}000000) g on e.c_clm_no=g.c_clm_no;  -- 领款人    75
+where g.t_pay_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s'); -- 支付时间
 
 alter table clm_pay  add index clm_pay_ix1 (c_clm_no);
 
@@ -192,14 +190,14 @@ select
 	p.acc_id_type,-- 实际领款人身份证件类型 11:居民身份证或临时身份证;12:军人或武警身份证件;13:港澳居民来往内地通行证,台湾居民来往大陆通行证或其他有效旅游证件;14:港澳台居民居住证;15:外国公民护照;16:户口簿;17:出生证;18:其他类个人身份证件;21:营业执照;22:其他,
 	p.acc_id_no,-- 实际领款人身份证件号码
 	cm.c_clm_no as receipt_no,-- 作业流水号,唯一标识号	
-    '20191013000000' pt
+    '{workday}000000' pt
 from s_rpt_fxq_tb_ins_rcla_ms cm
 	inner join clm_accdnt ac on cm.c_clm_no = ac.c_clm_no and cm.ins_cst_no = ac.c_ins_no-- 出险表   58	--不用C_INSURED_CDE因为团单没找到被保人号码
 	inner join clm_pay p on cm.c_clm_no = p.c_clm_no;
 
-	/* inner join ods_cthx_web_clm_rpt partition(pt20191013000000) e on cm.c_clm_no=e.c_clm_no -- 理赔申请人（理赔号唯一)  1054
-	inner join ods_cthx_web_clmnv_endcase partition(pt20191013000000) u on cm.c_clm_no = u.c_clm_no -- 结案  47
-	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on cm.c_clm_no=g.c_clm_no -- 领款人    75 */
+	/* inner join ods_cthx_web_clm_rpt partition(pt{workday}000000) e on cm.c_clm_no=e.c_clm_no -- 理赔申请人（理赔号唯一)  1054
+	inner join ods_cthx_web_clmnv_endcase partition(pt{workday}000000) u on cm.c_clm_no = u.c_clm_no -- 结案  47
+	inner join ods_cthx_web_clm_bank partition(pt{workday}000000) g on cm.c_clm_no=g.c_clm_no -- 领款人    75 */
 /*	
-where g.t_pay_tm between {beginday} and {endday}; -- 支付时间
+where g.t_pay_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s'); -- 支付时间
 */

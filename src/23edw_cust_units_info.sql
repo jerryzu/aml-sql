@@ -18,7 +18,7 @@
 
 SELECT @@global.group_concat_max_len;
 SET SESSION group_concat_max_len=102400;
-alter table edw_cust_units_info truncate partition pt20191013000000;
+alter table edw_cust_units_info truncate partition pt{workday}000000;
 
 insert into edw_cust_units_info(
     c_dpt_cde,
@@ -80,7 +80,7 @@ select
     ,substring_index(c_trd_cde,',',1) c_trd_cde
     ,substring_index(c_sub_trd_cde,',',1) c_sub_trd_cde
     ,substring_index(n_reg_amt,',',1) n_reg_amt    
-    ,'20191013000000' pt    
+    ,'{workday}000000' pt    
 from (
 	select     
 	    group_concat(c_dpt_cde order by c_per_biztype)  c_dpt_cde
@@ -142,7 +142,7 @@ from (
             ,null n_reg_amt
             ,c_per_biztype  	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
         from x_edw_cust_pers_units_info a
-            inner join ods_cthx_web_ply_base partition(pt20191013000000)   b on a.c_app_no = b.c_app_no
+            inner join ods_cthx_web_ply_base partition(pt{workday}000000)   b on a.c_app_no = b.c_app_no
         where b.t_next_edr_udr_tm > now() and a.c_clnt_mrk = 0 -- 客户分类,0 法人，1 个人
 			and c_cert_cls is not null and trim(c_cert_cls)  <> '' and c_cert_cls REGEXP '[^0-9.]' = 0
 			and c_cert_cde is not null and trim(c_cert_cde)  <> '' 

@@ -29,7 +29,7 @@
 while read task
 do
   echo $(date +%F%n%T): [$task] starting.....
-  sed -e's/{firstday}/firstday/g;s/{lastday}/lastday/g;s/{workday}/workday/g' $task > run/$task
+  sed -e's/{firstday}/firstday/g;s/{lastday}/lastday/g;s/{workday}/workday/g' ../src/$task > work/$task
   if [ $? -ne 0 ]
   then
     echo $(date +%F%n%T): [$task] error

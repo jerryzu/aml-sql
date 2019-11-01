@@ -30,7 +30,7 @@
 --  投保人被保人之间的关系
 --  受益人被保人之间的关系
 
-alter table edw_cust_ply_party truncate partition pt20191013000000;
+alter table edw_cust_ply_party truncate partition pt{workday}000000;
 
 select now();
 
@@ -82,7 +82,7 @@ from (
 				,c_ins_app_rel -- 被保险人与投保人之间的关系
                 ,c_per_biztype --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
         from  x_edw_cust_pers_units_info  a
-                inner join ods_cthx_web_ply_base partition(pt20191013000000)  b on a.c_app_no = b.c_app_no
+                inner join ods_cthx_web_ply_base partition(pt{workday}000000)  b on a.c_app_no = b.c_app_no
         where b.t_next_edr_udr_tm > now() 
                 and c_cert_cls is not null and trim(c_cert_cls)  <> '' and c_cert_cls REGEXP '[^0-9.]' = 0
                 and c_cert_cde is not null and trim(c_cert_cde)  <> ''
@@ -98,14 +98,14 @@ select
 	c_acc_name, 
 	c_cert_cls, 
 	c_cert_cde
-from edw_cust_pers_info partition(pt20191013000000)
+from edw_cust_pers_info partition(pt{workday}000000)
 union all
 select 
 	c_cst_no, 
 	c_acc_name, 
 	c_certf_cls, 
 	c_certf_cde
-from edw_cust_units_info  partition(pt20191013000000);
+from edw_cust_units_info  partition(pt{workday}000000);
 
 select now();
 
@@ -194,7 +194,7 @@ SELECT distinct
     m.t_next_edr_udr_tm, -- 下次批改核保日期 
     m.c_clnt_mrk,	--  客户类型
     m.c_per_biztype,		--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-    '20191013000000'	--  分区字段
+    '{workday}000000'	--  分区字段
 FROM ply_party_tmp2 m
     inner join ply_party_info_tmp p1 on m.c_cst_no = p1.c_cst_no;
 

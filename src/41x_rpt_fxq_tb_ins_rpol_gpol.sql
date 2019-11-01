@@ -32,8 +32,8 @@ select
         , mny.c_payer_nme         as acc_name -- 交费账号名称
         , mny.c_savecash_bank          as acc_no -- 交费账号
         , mny.c_bank_nme	          as acc_bank -- 交费账户开户机构名称
-from ods_cthx_web_fin_prm_due partition(pt20191013000000) due
-    	inner join ods_cthx_web_fin_cav_mny partition(pt20191013000000) mny on due.c_cav_no = mny.c_cav_pk_id
+from ods_cthx_web_fin_prm_due partition(pt{workday}000000) due
+    	inner join ods_cthx_web_fin_cav_mny partition(pt{workday}000000) mny on due.c_cav_no = mny.c_cav_pk_id
 order by  due.c_app_no, due.c_rcpt_no desc,  mny.n_item_no desc;   	
 
 drop table  if exists pay1;
@@ -113,6 +113,6 @@ select
         , p.acc_bank -- 交费账户开户机构名称
 	, b.c_edr_ctnt -- 变更内容摘要
         , b.c_grp_mrk -- 保单类型  (biz: 0 个单; 1 团单)11:非团险;12:团险
-from  ods_cthx_web_ply_base partition(pt20191013000000)  b
+from  ods_cthx_web_ply_base partition(pt{workday}000000)  b
      left join pay1 p on b.c_app_no = p.c_app_no    
 where b.t_next_edr_udr_tm > now();

@@ -21,7 +21,7 @@
 -- 说明：
 --   本表提取除退保、加保、减保、理赔、给付、保单质押借款等以外的所有非支付类保全/批改业务，每一次保全业务生产一条记录。
 
-alter table rpt_fxq_tb_ins_rchg_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_rchg_ms truncate partition pt{workday}000000;
 
 INSERT INTO rpt_fxq_tb_ins_rchg_ms(
         company_code1,
@@ -52,19 +52,17 @@ select
 	date_format(m.t_edr_bgn_tm,'%Y%m%d') as chg_date,-- 变更或批改日期
 	m.c_edr_no as chg_no,-- 批单号
     case 
-        when m.c_edr_rsn_bundle_cde = '22' then 12 -- 变更团单被保险人 -> 12 团险替换被保险人
-        -- when m.c_edr_rsn_bundle_cde = 'J1' then 13 -- 减少被保险人 -> 
-        -- when m.c_edr_rsn_bundle_cde = 'Z1' then 12 -- 增加被保险人
+    when m.c_edr_rsn_bundle_cde = '22' then 12 -- 变更团单被保险人 -> 12 团险替换被保险人
+    -- when m.c_edr_rsn_bundle_cde = 'J1' then 13 -- 减少被保险人 -> 
+    -- when m.c_edr_rsn_bundle_cde = 'Z1' then 12 -- 增加被保险人
     end as item, -- 保全/批改项目	11:变更投保人;12:团险替换被保险人;13:变更受益人;14:变更客户(投保人被保人)信息;15:保单转移;
 	m.c_edr_ctnt as con_bef,-- 变更内容摘要
-    '20191013000000' pt
+    '{workday}000000' pt
 from x_rpt_fxq_tb_ins_rpol_gpol m    
 	--  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	inner join edw_cust_ply_party partition(pt20191013000000) a on m.c_ply_no = a.c_ply_no and a.c_per_biztype in (21, 22)
-	inner join ods_cthx_web_bas_edr_rsn   partition(pt20191013000000) e on m.c_edr_rsn_bundle_cde = e.c_rsn_cde and substr(m.c_prod_no,1,2) = e.c_kind_no
-    left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
+	inner join edw_cust_ply_party partition(pt{workday}000000) a on m.c_ply_no = a.c_ply_no and a.c_per_biztype in (21, 22)
+	inner join ods_cthx_web_bas_edr_rsn   partition(pt{workday}000000) e on m.c_edr_rsn_bundle_cde = e.c_rsn_cde and substr(m.c_prod_no,1,2) = e.c_kind_no
+    left join  rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = m.c_dpt_cde
 where e.c_rsn_cde in ('22','-J1','-Z1') -- and m.t_next_edr_udr_tm > now()  
     and m.n_prm_var <> 0 --  测试此条件没有满足记录
-	/*
-	and m.t_app_tm between {beginday} and {endday} 
-	*/
+	and m.t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s')

@@ -28,33 +28,33 @@
 --      以及（2）表九、十一、十二业务中投保人为非自然人的保单信息（如某份保单在检查期内发生了多次涉及表九、十一、十二的业务，只需要数据提取当日的保单信息即可），如同一份保单同时符合（1）和（2）的条件，则分别提取多条记录。  
 --   2.本表保单涉及的被保险人、受益人相关信息在表八中单列。
 
-alter table rpt_fxq_tb_ins_gpol_ms truncate partition pt20191013000000;
+alter table rpt_fxq_tb_ins_gpol_ms truncate partition pt{workday}000000;
 
 select now();
 drop table if exists ply_tgt;
 
-create temporary table ply_tgt select c_app_no, left(c_tgt_addr, 100) as subject from ods_cthx_web_ply_ent_tgt partition(pt20191013000000);
+create temporary table ply_tgt select c_app_no, left(c_tgt_addr, 100) as subject from ods_cthx_web_ply_ent_tgt partition(pt{workday}000000);
 
 select now();
 drop table if exists prod;
 
-create temporary table prod select c_prod_no, c_kind_no from ods_cthx_web_prd_prod partition(pt20191013000000);
+create temporary table prod select c_prod_no, c_kind_no from ods_cthx_web_prd_prod partition(pt{workday}000000);
 
 select now();
 drop table if exists company;
-create temporary table company select company_code1, company_code2 from rpt_fxq_tb_company_ms partition (pt20191013000000);
+create temporary table company select company_code1, company_code2 from rpt_fxq_tb_company_ms partition (pt{workday}000000);
 
 select now();
 drop table if exists ply_party_app;
 
-create temporary table ply_party_app select * from edw_cust_ply_party   partition(pt20191013000000) a where  a.c_per_biztype = 22;
+create temporary table ply_party_app select * from edw_cust_ply_party   partition(pt{workday}000000) a where  a.c_per_biztype = 22;
 
 select now();
 drop table if exists ply_party_ins;
 
 create temporary table ply_party_ins
 select pi.c_ply_no, pi.c_app_no, count(1) ins_num
-from  edw_cust_ply_party partition(pt20191013000000) pi 
+from  edw_cust_ply_party partition(pt{workday}000000) pi 
 --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 where pi.c_per_biztype in (31,32,33) 
 group by pi.c_ply_no,pi.c_app_no;
@@ -131,7 +131,7 @@ SELECT
     end  as sale_type,-- 销售渠道
     -- 个人代理：为代理人名称；银保通代理点：**银行**分行等
 	/* 销售渠道名称 unpass*/   -- 对应Sale_type销售渠道填写。如销售渠道为"个人代理", 则本字段填写为个人代理人名称(如"张**"); 销售渠道为"银保通代理点", 则本字段填写为"**银行**分行"等。
-    (select c_cha_nme from ods_cthx_web_cus_cha partition(pt20191013000000) v where v.c_cha_cde = m.c_brkr_cde) as sale_name,-- 销售渠道名称
+    (select c_cha_nme from ods_cthx_web_cus_cha partition(pt{workday}000000) v where v.c_cha_cde = m.c_brkr_cde) as sale_name,-- 销售渠道名称
     date_format(m.t_app_tm,'%Y%m%d')        as ins_date,-- 投保日期
     date_format(m.t_insrnc_bgn_tm,'%Y%m%d') as eff_date,-- 合同生效日期
     a.c_acc_name                            as app_name,-- 投保人名称
@@ -192,7 +192,7 @@ SELECT
     m.acc_no          as acc_no,-- 交费账号
     m.acc_bank	          as acc_bank,-- 交费账户开户机构名称
     m.c_app_no  as receipt_no,-- 作业流水号,唯一标识号
-    '20191013000000'    pt
+    '{workday}000000'    pt
 from  x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 	inner join ply_party_app a on m.c_app_no =a.c_app_no
@@ -200,7 +200,5 @@ from  x_rpt_fxq_tb_ins_rpol_gpol m
     inner join prod p on m.c_prod_no=p.c_prod_no
     inner join ply_party_ins v on m.c_app_no = v.c_app_no
     inner join company co on co.company_code1 = m.c_dpt_cde
-/*	
-where m.t_next_edr_udr_tm >  {endday}
-	and m.t_app_tm between {beginday} and {endday} 
-*/ 
+where m.t_next_edr_udr_tm >  str_to_date('{endday}235959','%Y%m%d%H%i%s')
+	and m.t_app_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s');

@@ -123,7 +123,7 @@ select
     ,c_mobile  -- 移动电话
     ,c_clnt_addr  -- 地址
     ,c_work_dpt  -- 工作单位
-from ods_cthx_web_ply_applicant partition(pt20191013000000)
+from ods_cthx_web_ply_applicant partition(pt{workday}000000)
 where c_certf_cls is not null and trim(c_certf_cls)  <> '' and c_certf_cls REGEXP '[^0-9.]' = 0
         and c_certf_cde is not null and trim(c_certf_cde)  <> '' and left(c_certf_cde, 17)  REGEXP '[^0-9.]' = 0;
 
@@ -224,7 +224,7 @@ select
         ,c_mobile  -- 移动电话
         ,c_clnt_addr -- 地址
         ,c_work_dpt -- 工作单位
-from ods_cthx_web_app_insured partition(pt20191013000000)
+from ods_cthx_web_app_insured partition(pt{workday}000000)
 where c_certf_cls is not null and trim(c_certf_cls)  <> '' and c_certf_cls REGEXP '[^0-9.]' = 0
         and c_certf_cde is not null and trim(c_certf_cde)  <> '' and left(c_certf_cde, 17)  REGEXP '[^0-9.]' = 0;
 
@@ -336,7 +336,7 @@ select
         ,c_mobile  c_mobile -- 移动电话
         ,null  c_clnt_addr -- 地址
         ,null c_work_dpt  -- 工作单位
-from ods_cthx_web_ply_bnfc partition(pt20191013000000)		
+from ods_cthx_web_ply_bnfc partition(pt{workday}000000)		
 where c_certf_cls is not null and trim(c_certf_cls)  <> '' and c_certf_cls REGEXP '[^0-9.]' = 0
         and c_certf_cde is not null and trim(c_certf_cde)  <> '' and left(c_certf_cde, 17)  REGEXP '[^0-9.]' = 0;
 
@@ -434,7 +434,7 @@ select
         ,null c_mobile
         ,null c_clnt_addr
         ,null c_work_dpt
-from ods_cthx_web_app_grp_member partition(pt20191013000000)
+from ods_cthx_web_app_grp_member partition(pt{workday}000000)
 where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0
         and c_cert_no is not null and trim(c_cert_no)  <> '' and left(c_cert_no, 17)  REGEXP '[^0-9.]' = 0;
 
@@ -532,7 +532,7 @@ select
         ,null c_mobile
         ,null c_clnt_addr
         ,null c_work_dpt
-from ods_cthx_web_app_grp_member partition(pt20191013000000)
+from ods_cthx_web_app_grp_member partition(pt{workday}000000)
 where c_bnfc_cert_typ is not null and trim(c_bnfc_cert_typ)  <> '' and c_bnfc_cert_typ REGEXP '[^0-9.]' = 0
         and c_bnfc_cert_no is not null and trim(c_bnfc_cert_no)  <> '' and left(c_bnfc_cert_no, 17)  REGEXP '[^0-9.]' = 0;
 
@@ -631,7 +631,7 @@ select
         ,c_tel_no c_mobile
         ,null c_clnt_addr
         ,null c_work_dpt
-from ods_cthx_web_clm_bank  partition(pt20191013000000) a
-        inner join ods_cthx_web_clm_main partition(pt20191013000000) c on a.c_clm_no = c.c_clm_no
+from ods_cthx_web_clm_bank  partition(pt{workday}000000) a
+        inner join ods_cthx_web_clm_main partition(pt{workday}000000) c on a.c_clm_no = c.c_clm_no
 where c_card_type is not null and trim(c_card_type)  <> '' and c_card_type REGEXP '[^0-9.]' = 0
         and c_card_cde is not null and trim(c_card_cde)  <> '' and left(c_card_cde, 17)  REGEXP '[^0-9.]' = 0;

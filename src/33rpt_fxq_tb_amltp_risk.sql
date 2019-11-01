@@ -19,7 +19,7 @@
 --  修改人: 
 --  修改内容：
 
-alter table rpt_fxq_tb_amltp_risk truncate partition pt20191013000000;
+alter table rpt_fxq_tb_amltp_risk truncate partition pt{workday}000000;
 
 insert into rpt_fxq_tb_amltp_risk(
 	company_code1,
@@ -52,12 +52,12 @@ select
 	r.score_time score_time,	--	划分日期	
 	r.score score,	--	评分分值
 	'依据评分分值划分' norm,	--	划分依据
-	'20191013000000' pt	--	分区字段
-from rpt_fxq_tb_amltp_entity  partition (pt20191013000000) e
-    inner join rpt_fxq_tb_amltp_score  partition (pt20191013000000) r on e.c_clnt_cde = r.c_clnt_cde
-    inner join (select c_cst_no, c_cert_cls, c_cert_cde, c_acc_name, c_dpt_cde from edw_cust_pers_info partition (pt20191013000000)
+	'{workday}000000' pt	--	分区字段
+from rpt_fxq_tb_amltp_entity  partition (pt{workday}000000) e
+    inner join rpt_fxq_tb_amltp_score  partition (pt{workday}000000) r on e.c_clnt_cde = r.c_clnt_cde
+    inner join (select c_cst_no, c_cert_cls, c_cert_cde, c_acc_name, c_dpt_cde from edw_cust_pers_info partition (pt{workday}000000)
 		union 
-		select c_cst_no, c_certf_cls, c_certf_cde, c_acc_name, c_dpt_cde from edw_cust_units_info partition (pt20191013000000)
+		select c_cst_no, c_certf_cls, c_certf_cde, c_acc_name, c_dpt_cde from edw_cust_units_info partition (pt{workday}000000)
 	--  ) pi on e.c_cst_no = pi.c_cst_no
 	) pi on e.c_cert_type = pi.c_cert_cls and e.c_cert_cde = pi.c_cert_cde
     inner join  rpt_fxq_manual_company_ms co on co.company_code1 = pi.c_dpt_cde

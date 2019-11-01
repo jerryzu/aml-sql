@@ -32,7 +32,7 @@
 
 drop table if exists clm_ply;
 create temporary table clm_ply
-select
+select distinct
         m.c_dpt_cde as company_code1,-- 机构网点代码
         co.company_code2 as company_code2, -- 金融机构编码，人行科技司制定的14位金融标准化编码  暂时取“监管机构码，机构外部码，列为空”
         '' as company_code3,-- 保单归属机构网点代码
@@ -44,14 +44,11 @@ select
         m.t_insrnc_bgn_tm,-- 合同生效日期
         case m.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- b.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
         cm.c_clm_no as receipt_no -- 作业流水号,唯一标识号
-from  ods_cthx_web_clm_main partition(pt20191013000000) cm -- 8472
+from  ods_cthx_web_clm_main partition(pt{workday}000000) cm -- 8472
 	inner join x_rpt_fxq_tb_ins_rpol_gpol m on cm.c_ply_no = m.c_ply_no -- 理赔主表  1194
-	left join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
-	inner join ods_cthx_web_clm_bank partition(pt20191013000000) g on cm.c_clm_no=g.c_clm_no -- 领款人 1480    
-/*	
-where g.t_pay_tm between {beginday} and {endday}; -- 支付时间
-*/
-;
+	left join  rpt_fxq_tb_company_ms partition (pt{workday}000000) co on co.company_code1 = m.c_dpt_cde
+	inner join ods_cthx_web_clm_bank partition(pt{workday}000000) g on cm.c_clm_no=g.c_clm_no -- 领款人 1480   
+where g.t_pay_tm between str_to_date('{beginday}000000','%Y%m%d%H%i%s') and str_to_date('{endday}235959','%Y%m%d%H%i%s'); -- 支付时间
 
 drop table if exists clm_ply_app;
 create temporary table clm_ply_app
@@ -73,7 +70,7 @@ select
 	m.receipt_no -- 作业流水号,唯一标识号
 from  clm_ply m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-    inner join edw_cust_ply_party   partition(pt20191013000000) a on m.c_app_no =a.c_app_no and a.c_per_biztype in (21, 22);
+    inner join edw_cust_ply_party   partition(pt{workday}000000) a on m.c_app_no =a.c_app_no and a.c_per_biztype in (21, 22);
 
 drop table if exists clm_ply_no;
 create temporary table clm_ply_no 
@@ -101,7 +98,7 @@ from (select
         ,pn.c_app_no
         ,concat(rpad(gmb.c_cert_typ, 6, '0') , rpad(gmb.c_cert_no, 18, '0'))  c_ins_no -- 被保人编码
         ,concat(rpad(gmb.c_bnfc_cert_typ, 6, '0') , rpad(gmb.c_bnfc_cert_no, 18, '0'))  c_bnfc_no -- 受益人编码
-    from ods_cthx_web_app_grp_member partition(pt20191013000000) gmb
+    from ods_cthx_web_app_grp_member partition(pt{workday}000000) gmb
         inner join clm_ply_no pn
             on gmb.c_app_no = pn.c_app_no
     where c_cert_typ is not null and trim(c_cert_typ)  <> '' and c_cert_typ REGEXP '[^0-9.]' = 0 and c_cert_no is not null and trim(c_cert_no)  <> '' 
@@ -199,14 +196,14 @@ select
 	c_acc_name, 
 	c_cert_cls, 
 	c_cert_cde
-from edw_cust_pers_info partition(pt20191013000000)
+from edw_cust_pers_info partition(pt{workday}000000)
 union all
 select 
 	c_cst_no, 
 	c_acc_name, 
 	c_certf_cls, 
 	c_certf_cde
-from edw_cust_units_info partition(pt20191013000000);
+from edw_cust_units_info partition(pt{workday}000000);
 
 drop table if exists party_info2;
 
