@@ -31,25 +31,41 @@
 alter table rpt_fxq_tb_ins_gpol_ms truncate partition pt20191013000000;
 
 select now();
+drop table if exists ply_tgt;
+
+create temporary table ply_tgt select c_app_no, left(c_tgt_addr, 100) as subject from ods_cthx_web_ply_ent_tgt partition(pt20191013000000);
+
+select now();
+drop table if exists prod;
+
+create temporary table prod select c_prod_no, c_kind_no from ods_cthx_web_prd_prod partition(pt20191013000000);
+
+select now();
+drop table if exists company;
+create temporary table company select company_code1, company_code2 from rpt_fxq_tb_company_ms partition (pt20191013000000);
+
+select now();
 drop table if exists ply_party_app;
 
-create temporary table ply_party_app 
-select * from edw_cust_ply_party   partition(pt20191013000000) a where  a.c_per_biztype = 22;
-
+create temporary table ply_party_app select * from edw_cust_ply_party   partition(pt20191013000000) a where  a.c_per_biztype = 22;
 
 select now();
 drop table if exists ply_party_ins;
 
 create temporary table ply_party_ins
-select pi.c_ply_no, count(1) ins_num
+select pi.c_ply_no, pi.c_app_no, count(1) ins_num
 from  edw_cust_ply_party partition(pt20191013000000) pi 
 --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
 where pi.c_per_biztype in (31,32,33) 
-group by pi.c_ply_no;
+group by pi.c_ply_no,pi.c_app_no;
 
-
-alter table ply_party_app  add index ply_party_app_ix1 (c_ply_no);
+alter table ply_party_app  add index ply_party_app_ix1 (c_app_no);
 alter table ply_party_ins  add index ply_party_ins_ix1 (c_ply_no);
+
+alter table ply_tgt  add index ply_tgt_ix1 (c_app_no);
+alter table prod  add index prod_ix1 (c_prod_no);
+alter table company  add index company_ix1 (company_code1);
+
 
 select now();
  
@@ -169,7 +185,7 @@ SELECT
     14       as del_period,-- 缴费间隔 -- 11:年缴;12:季缴;13:月缴;14:其他;
     1        as `limit`,-- 交费期数  趸交为1;终身缴费填写9999.填写实际期数.
 	/* 保险标的物 ???为啥是地址 unpass */  -- 本字段适用财产保险, 填写具体的保险标的物名称, 如车牌号码; 无法明确指向保险标的统一填写替代符"@N"
-    left(t.c_tgt_addr, 100) as subject,-- 保险标的物
+    t.subject,-- 保险标的物
 	/* 现转标识 unpass*/  -- 10: 现金交保险公司; 11: 转账; 12: 现金缴款单(指客户向银行缴纳现金, 凭借银行开具的单据向保险机构办理交费业务); 13: 保险公司业务员代付。网银转账、银行柜面转账、POS刷卡、直接转账给总公司账户等情形, 应标识为转账。填写数字。
     case m.c_pay_mde_cde when 5 then 11 else 10 end as tsf_flag,-- d.c_pay_mde_cde  as tsf_flag,-- 现转标识 --  SELECT C_CDE, C_CNM, 'codeKind' FROM  WEB_BAS_CODELIST PARTITION(pt20190818000000)   WHERE C_PAR_CDE = 'shoufeifangshi' ORDER BY C_CDE ;
     m.acc_name         as acc_name,-- 交费账号名称
@@ -179,14 +195,12 @@ SELECT
     '20191013000000'    pt
 from  x_rpt_fxq_tb_ins_rpol_gpol m
     --  保单人员参于类型: 投保人: [个人:21, 法人:22]; 被保人: [个人:31, 法人:32, 团单被保人:33]; 受益人: [个人:41, 法人:42,团单受益人:43]; 收款人:[11]
-	inner join ply_party_app a on m.c_ply_no =a.c_ply_no
-    inner join ods_cthx_web_ply_ent_tgt partition(pt20191013000000) t
-        on m.c_ply_no=t.c_ply_no
-    inner join ods_cthx_web_prd_prod partition(pt20191013000000) p 
-        on m.c_prod_no=p.c_prod_no
-    inner join ply_party_ins v on m.c_ply_no = v.c_ply_no -- error
-    inner join  rpt_fxq_tb_company_ms partition (pt20191013000000) co on co.company_code1 = m.c_dpt_cde
+	inner join ply_party_app a on m.c_app_no =a.c_app_no
+    inner join ply_tgt t on m.c_app_no=t.c_app_no
+    inner join prod p on m.c_prod_no=p.c_prod_no
+    inner join ply_party_ins v on m.c_app_no = v.c_app_no
+    inner join company co on co.company_code1 = m.c_dpt_cde
 /*	
 where m.t_next_edr_udr_tm >  {endday}
 	and m.t_app_tm between {beginday} and {endday} 
-*/
+*/ 
