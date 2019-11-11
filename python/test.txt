@@ -1,0 +1,17 @@
+# pip install --download E:\python27\packages pandas
+# pip install --no-index --find-links=D:\python27\packages
+
+# 1.首先，你得有一个外网机，跟内网机要装的系统一样，最好干净一点
+# 2.外网机安装好mitmproxy:
+#     查看pip3 list，记录下来
+#     pip3 install mitmproxy
+# 3.生成依赖清单
+#     pip3 freeze >requirements.txt
+#     从requirements.txt中去除第2个步骤中使用pip3 list查看得到的安装包
+# 4.下载依赖包(创建一个/home/packet目录，进入该目录下执行以下命令)
+#     pip3 download ./ -r ../requirements.txt
+# 这样子安装mitmproxy所需要的依赖包都在/home/packet目录下了
+
+# C:\Users\jerry\Downloads\pip-19.3.1\pip-19.3.1>c:\Python27\python.exe setup.py install
+# c:\Python27\Scripts>c:\Python27\Scripts\pip.exe install xlwt
+# c: \Python27 > Scripts\pip.exe install pymysql
