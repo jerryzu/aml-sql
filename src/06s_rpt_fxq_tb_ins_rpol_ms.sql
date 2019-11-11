@@ -219,6 +219,7 @@ FROM s_rpt_fxq_tb_ins_rpol_ms_tmp m
     inner join edw_cust_partys_info_tmp p1 on m.c_ins_no = p1.c_cst_no;
     -- inner join edw_cust_partys_info_tmp p2 on m.c_bnfc_no = p2.c_cst_no;
 
+
 select now();
 insert into s_rpt_fxq_tb_ins_rpol_ms(
     c_dpt_cde,
@@ -244,17 +245,28 @@ SELECT
     m.c_ins_name ,
     m.c_ins_cert_cls ,
     m.c_ins_cert_cde ,
-    m.c_bnfc_no,
+    group_concat(m.c_bnfc_no) c_bnfc_no,
     m.c_bnfc_clnt_mrk, 
-    p2.c_acc_name c_bnfc_name,
-    p2.c_cert_cls c_bnfc_cert_cls,
-    p2.c_cert_cde c_bnfc_cert_cde,
+    group_concat(p2.c_acc_name) c_bnfc_name,
+    group_concat(p2.c_cert_cls) c_bnfc_cert_cls,
+    group_concat(p2.c_cert_cde) c_bnfc_cert_cde,
     m.c_ply_no,
     m.c_app_no,
     m.c_grp_mrk,
     '{workday}000000' pt
 FROM s_rpt_fxq_tb_ins_rpol_ms_tmp2 m
     -- inner join edw_cust_partys_info_tmp p1 on m.c_insured_no = p1.c_cst_no
-    inner join edw_cust_partys_info_tmp p2 on m.c_bnfc_no = p2.c_cst_no;   
+    inner join edw_cust_partys_info_tmp p2 on m.c_bnfc_no = p2.c_cst_no
+group by         
+    m.c_dpt_cde,
+    m.c_ins_no,
+    m.c_ins_clnt_mrk,
+    m.c_ins_name ,
+    m.c_ins_cert_cls ,
+    m.c_ins_cert_cde,
+    m.c_bnfc_clnt_mrk, 
+    m.c_ply_no,
+    m.c_app_no,
+    m.c_grp_mrk;
 
-select now();	
+select now();

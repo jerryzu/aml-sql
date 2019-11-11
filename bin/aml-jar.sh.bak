@@ -1,0 +1,8 @@
+#!/bin/bash
+cd ../
+java -jar lib/aml-1.0.jar -DWorkDay=20190101 -tcsv -f"/alidata/workspace/aml/work/"
+tar -czvf work/aml.tar.gz work/*.csv
+rm -rf /alidata/workspace/aml/work/*.csv
+cd bin
+
+

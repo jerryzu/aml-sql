@@ -19,3 +19,10 @@ edw_pdm
 alter table edw_pdm.web_fin_prm_due add(c_ma_bala_mrk varchar2(3) default '0'); comment on column edw_pdm.web_fin_prm_due.c_ma_bala_mrk is '挂账冲销标识';
 alter table edw_pdm.web_fin_prm_due add(c_follow_con_cde varchar2(600) default null); comment on column edw_pdm.web_fin_prm_due.c_follow_con_cde is '共保人（仅供页面显示使用）';
 alter table edw_pdm.web_fin_prm_due add(c_abstract varchar2(300) default null); comment on column edw_pdm.web_fin_prm_due.c_abstract is '资金系统对账码';
+
+
+20191104
+ALTER TABLE    `tpedw`.`s_rpt_fxq_tb_ins_rpol_ms` MODIFY COLUMN `c_bnfc_no` VARCHAR(300) COMMENT '受益人客户编号';
+ALTER TABLE    `tpedw`.`s_rpt_fxq_tb_ins_rpol_ms` MODIFY COLUMN `c_bnfc_name` VARCHAR(120) COMMENT '受益人名称';
+ALTER TABLE    `tpedw`.`s_rpt_fxq_tb_ins_rpol_ms` MODIFY COLUMN `c_bnfc_cert_cls` VARCHAR(200) COMMENT    '受益人身份证件种类';
+ALTER TABLE    `tpedw`.`s_rpt_fxq_tb_ins_rpol_ms` MODIFY COLUMN `c_bnfc_cert_cde` VARCHAR(500) COMMENT    '受益人身份证件号码'
